@@ -3,7 +3,7 @@ using System.Text;
 
 using Newtonsoft.Json;
 
-namespace Docc.Common;
+namespace Docc.Common.Data;
 
 [Serializable]
 public class SharedClient
@@ -18,12 +18,12 @@ public class SharedClient
 
 public class SharedSenderInfo
 {
-    public SharedClient Sender { get; init; }
+    public SharedClient? Sender { get; init; }
     public Socket? Socket { get; init; }
 
     public void Serve(Request content)
     {
-        Socket.Send(Encoding.Default.GetBytes(content.Serialize()));
+        Socket?.Send(Encoding.Default.GetBytes(content.Serialize()));
         // do not care about a response here, will be handled elsewhere.
     }
 }

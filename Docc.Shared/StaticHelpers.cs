@@ -13,9 +13,21 @@ public static class StaticHelpers
         => RequestResult.ContentNotFound;
     public static RequestResult Okay()
         => RequestResult.OK;
-
+    public static RequestResult DeadSocket()
+        => RequestResult.SockedDied;
+    public static RequestResult BadContent()
+        => RequestResult.BadPacket;
+    public static RequestResult FileNotFound()
+        => RequestResult.FileNotFound;
+    public static RequestResult BadArgs()
+        => RequestResult.BadArguments;
+    public static RequestBuilder Builder()
+        => new();
     public static void Exit(int code)
-        => Environment.Exit(code);
+    {
+        Environment.ExitCode = code;
+        Environment.Exit(code);
+    }
 }
 
 public static class SocketExtensions

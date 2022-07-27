@@ -1,4 +1,5 @@
 ﻿using Docc.Common;
+using Docc.Common.Data;
 using Newtonsoft.Json;
 using System.Net;
 using System.Net.Sockets;
@@ -21,7 +22,7 @@ internal class ClientConnection
 
         // at this point, if the local user is banned, they are gone.
 
-        Address = Entry.AddressList[0];
+        Address = Entry.AddressList[1];
         ServerEndpoint = new IPEndPoint(Address, 25755);
         Socket = new Socket(Address.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
@@ -31,6 +32,7 @@ internal class ClientConnection
         {
             try
             {
+                _logger.Log($"attempting to connect to the server");
                 Socket.Connect(ServerEndpoint);
             }
             catch
@@ -49,6 +51,8 @@ internal class ClientConnection
         }
 
         // We're connected, instantly send the client info over.
+
+        _logger.Log($"resolved host [{ServerEndpoint.Address}:{ServerEndpoint.Port}, {ServerEndpoint.AddressFamily}]");
 
         var rb = new RequestBuilder()
             .WithLocation("/")

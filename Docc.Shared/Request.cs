@@ -85,7 +85,7 @@ public class Request
 
 public class RequestBuilder
 {
-    private string _location;
+    private string _location = "/";
     private Dictionary<string, string> _arguments = new();
     private RequestResult _result;
     private string _userAgent = Environment.GetEnvironmentVariable("App-Agent")!;
@@ -112,42 +112,42 @@ public class RequestBuilder
         };
     }
 
-    public RequestBuilder WithLocation  (string location)
+    public RequestBuilder WithLocation(string location)
     {
         _location = location;
         return this;
     }
-    public RequestBuilder WithArguments (Dictionary<string, string> arguments)
+    public RequestBuilder WithArguments(Dictionary<string, string> arguments)
     {
         _arguments = arguments;
         return this;
     }
-    public RequestBuilder WithArgument  (string Key, string Value)
+    public RequestBuilder WithArgument(string Key, string Value)
     {
         _arguments.TryAdd(Key, Value);
         return this;
     }
-    public RequestBuilder WithResult    (RequestResult result)
+    public RequestBuilder WithResult(RequestResult result)
     {
         this._result = result;
         return this;
     }
-    public RequestBuilder WithAgent     (string agent)
+    public RequestBuilder WithAgent(string agent)
     {
         this._userAgent = agent;
         return this;
     }
-    public RequestBuilder WithContent   (List<string> contents)
+    public RequestBuilder WithContent(List<string> contents)
     {
         _content = contents;
         return this;
     }
-    public RequestBuilder WithContent   (string contents, char delim)
+    public RequestBuilder WithContent(string contents, char delim)
     {
         _content = contents.Split(delim).ToList();
         return this;
     }
-    public RequestBuilder AddContent    (string contents)
+    public RequestBuilder AddContent(string contents)
     {
         _content.Add(contents);
         return this;

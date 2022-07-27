@@ -50,10 +50,26 @@ public enum RequestResult : ushort
     FileNotFound = 201,
 
     /*
+     * Occurs when the user has insufficent permissions.
+     */
+    NotAuthorized,
+
+    /*
+     * Occurs when the sender is disconnecting.
+     */
+    Disconnecting,
+
+    /*
      * Just a 404 error. This tells the receiver the specified content
      * was not found.
      */
-    ContentNotFound = 404
+    ContentNotFound = 404,
+
+    /*
+     * An error that specifies that you specified incorrect
+     * arguments to an endpoint.
+     */
+    BadArguments = 405
 }
 
 public class Translation
@@ -69,7 +85,10 @@ public class Translation
             { RequestResult.ContentNotFound, "The specified endpoint could not be found." },
             { RequestResult.SockedDied, "The remote applicant disconnected." },
             { RequestResult.FileNotFound, "The remote applicant failed to find a required file."},
-            { RequestResult.BadPacket, "One or more packets were malformed or invalid." }
+            { RequestResult.BadPacket, "One or more packets were malformed or invalid." },
+            { RequestResult.NotAuthorized, "You do not have the permissions to do this." },
+            { RequestResult.BadArguments, "You specified incorrect arguments to an endpoint." },
+            { RequestResult.Disconnecting, "The sender is disconnecting." }
         };
 
     public RequestResult Original { get; init; }

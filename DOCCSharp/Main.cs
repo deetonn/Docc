@@ -1,22 +1,29 @@
 ﻿global using static Docc.Common.StaticHelpers;
-using Docc.Common;
 using Docc.Client;
+using Docc.Common;
+using System.Diagnostics;
 
-ClientConnection connection = new ClientConnection(new Docc.Common.SharedClient()
+Client Client = new Client();
+
+Stopwatch Stopwatch = Stopwatch.StartNew();
+
+new Thread(() => 
 {
-    Name = "Deeton",
-    Id = Guid.NewGuid()
-});
+    while (true)
+    {
+        var version = Client.MakeRequest(
+            new RequestBuilder()
+            .WithLocation("/api/v1/version")
+            .Build()
+        );
+
+        Console.Title = $"Docc Client - (server: {version?.Content.First()})";
+
+        Thread.Sleep(TimeSpan.FromSeconds(5));
+    }
+}).Start();
 
 while (true)
 {
-    var vrq = new RequestBuilder()
-        .WithLocation("/api/v2/raw-version")
-        .Build();
 
-    var version = connection.MakeRequest(vrq);
-
-    Console.WriteLine(version + "\n\nPress any key to redo request...");
-
-    Console.ReadKey();
 }

@@ -3,6 +3,8 @@ using System.Net.Sockets;
 
 using Newtonsoft.Json;
 
+using Docc.Common.Auth;
+using Docc.Common.Data;
 using Docc.Common;
 
 namespace Docc.Server;
@@ -16,7 +18,13 @@ namespace Docc.Server;
 
 internal class ServerConnection
 {
-    public readonly ILogger _logger;
+    public readonly ILogger Logger;
+    private IAuthorizationService _authService;
+
+    public void UseAuthorization<T>() where T : IAuthorizationService, new()
+    {
+        _authService = new T();
+    }
 
     public string Version { get; }
     public string AppName { get; }
@@ -35,7 +43,8 @@ internal class ServerConnection
 
     public ServerConnection()
     {
-        _logger = new ServerConsoleLogger();
+        Logger = new ServerConsoleLogger();
+        _authService = new PrivateServerAuthorization();
 
         // start the server on ServerSocket.
 
@@ -46,9 +55,9 @@ internal class ServerConnection
 
         // TODO: replace all console.writeline's with 
         // a better logging system.
-        _logger.Log($"starting server. ({AppName})");
+        Logger.Log($"starting server. ({AppName})");
 
-        Address = Host.AddressList[0];
+        Address = Host.AddressList[1];
         Endpoint = new IPEndPoint(Address, 25755);
         Socket = new Socket(Address.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
         Socket.Bind(Endpoint);
@@ -56,7 +65,7 @@ internal class ServerConnection
 
         Listener = new(() =>
         {
-            _logger.Log("began accepting clients...");
+            Logger.Log("began accepting clients...");
 
             while (Running)
             {
@@ -64,7 +73,7 @@ internal class ServerConnection
 
                 // TODO: authenticate the user
 
-                Request? firstPacket = connection.ReceiveEncrypted(_logger);
+                Request? firstPacket = connection.ReceiveEncrypted(Logger);
                 SharedClient? info;
 
                 try
@@ -75,7 +84,7 @@ internal class ServerConnection
                     {
                         // client didn't send the first packet, which we expected.
                         // chances are it's not our client or they're lagging.
-                        _logger?.Log($"client contents were null.");
+                        Logger?.Log($"client contents were null.");
 
                         var rejection = new RequestBuilder()
                             .WithLocation(Request.DefaultLocation)
@@ -94,9 +103,9 @@ internal class ServerConnection
                 {
                     // we failed to deserialize the first packet. Just reject the
                     // connection.
-                    
+
                     // sending random stuff instantly grants you a fuck off
-                    _logger.Log("failed to deserialize request contents.");
+                    Logger?.Log("failed to deserialize request contents.");
 
                     var rb = new RequestBuilder()
                         .WithLocation(Request.DefaultLocation)
@@ -110,14 +119,27 @@ internal class ServerConnection
 
                 if (info is not SharedClient user)
                 {
-                    _logger.Log("client sent invalid ServerClient object");
+                    Logger?.Log("client sent invalid ServerClient object");
+                    connection.Close();
+                    continue;
+                }
+
+                if (!_authService?.Authorize(user) ?? false)
+                {
+                    Logger?.Log($"user '{user.Name}' failed authentication.");
+                    connection.SendEncrypted(
+                        new RequestBuilder()
+                            .WithLocation(Request.DefaultLocation)
+                            .WithResult(RequestResult.NotAuthorized)
+                            .AddContent("Failed to authorize you.")
+                            .Build());
                     connection.Close();
                     continue;
                 }
 
                 Connections.Add(ServerClient.From(user), connection);
 
-                _logger.Log($"accepted client '{user.Name}'");
+                Logger?.Log($"accepted client '{user.Name}'");
 
                 var accepted = new RequestBuilder()
                     .WithLocation("/")
@@ -134,13 +156,21 @@ internal class ServerConnection
             {
                 SpinWait.SpinUntil(() => Connections.Any(x => x.Value.Available > 0));
                 var clientsWhoSentMessages = Connections.Where(x => x.Value.Available > 0);
-                _logger.Log($"accepting {clientsWhoSentMessages.Count()} requests...");
+                Logger.Log($"accepting {clientsWhoSentMessages.Count()} requests...");
 
                 List<(Request?, Socket)> sentMessages = new();
 
                 foreach (var client in clientsWhoSentMessages)
                 {
                     var message = client.Value.ReceiveEncrypted();
+
+                    if (message?.Result == RequestResult.Disconnecting)
+                    {
+                        Logger?.Log($"{client.Key.Name} has disconnected.");
+                        Connections.Remove(client.Key);
+                        continue;
+                    }
+
                     sentMessages.Add((message, client.Value));
                 }
 
@@ -171,6 +201,16 @@ internal class ServerConnection
 
         };
 
+    public void EditUser(string nameOrId, Func<ServerClient, ServerClient> man)
+    {
+        if (Connections.Any(x => x.Key.Name == nameOrId || x.Key.Id.ToString() == nameOrId))
+            return;
+
+        var user = Connections.Where(x => x.Key.Name == nameOrId || x.Key.Id.ToString() == nameOrId).First();
+        Connections.Remove(user.Key);
+        Connections.Add(man(user.Key), user.Value);
+    }
+
     // iterate all users & remove any who's connection
     // has dropped.
     private void ValidateUsers()
@@ -182,7 +222,7 @@ internal class ServerConnection
             if (!conn.Connected)
             {
                 schedule.Add(conn);
-                _logger.Log($"client '{user.Name}' has disconnected.");
+                Logger.Log($"client '{user.Name}' has disconnected.");
             }
         }
 

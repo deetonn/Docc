@@ -1,4 +1,4 @@
-﻿using System.Net.Sockets;
+﻿using Docc.Common.Data;
 
 namespace Docc.Common;
 
@@ -12,8 +12,10 @@ public record DirectoryListing(string Location, ContentCallback Responder);
 
 public class DirectoryListingManager
 {
-    protected List<DirectoryListing> ActiveListings { get; set; }
+    public List<DirectoryListing> ActiveListings { get; set; }
         = new List<DirectoryListing>();
+    public int Count()
+        => ActiveListings.Count;
 
     public void MapGet(string Location, ContentCallback callback)
     {
