@@ -129,12 +129,12 @@ public class RequestBuilder
     }
     public RequestBuilder WithResult(RequestResult result)
     {
-        this._result = result;
+        _result = result;
         return this;
     }
     public RequestBuilder WithAgent(string agent)
     {
-        this._userAgent = agent;
+        _userAgent = agent;
         return this;
     }
     public RequestBuilder WithContent(List<string> contents)
