@@ -9,12 +9,23 @@ internal class Client
 {
     const string ApiKey = "249995ce-1683-4fc5-83e0-5628de154fe3";
     protected ClientConnection Connection { get; }
-    protected ILogger _logger;
+    protected ILogger? _logger;
+
+    public void UseLogger<T>() where T : class, ILogger
+    {
+        var instance = Activator.CreateInstance(typeof(T));
+
+        if (instance is ILogger logger)
+        {
+            _logger = logger;
+            return;
+        }
+
+        throw new InvalidCastException($"failed to create instance of '{typeof(T).Name}'. Does it have a default constructor?");
+    }
 
     public Client()
     {
-        _logger = new ClientConsoleLogger();
-
         var sessionUid = Guid.NewGuid();
 
         Connection = new ClientConnection(new()
@@ -36,12 +47,12 @@ internal class Client
 
         if (response?.Result != RequestResult.OK)
         {
-            _logger.Log($"server did not authorize request.");
+            _logger?.Log($"server did not authorize request.");
             return;
         }
         else
         {
-            _logger.Log($"server authorized you as IsAdmin.");
+            _logger?.Log($"server authorized you as IsAdmin.");
         }
     }
 

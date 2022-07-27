@@ -5,9 +5,11 @@ using System.Diagnostics;
 
 Client Client = new Client();
 
+Client.UseLogger<ClientConsoleLogger>();
+
 Stopwatch Stopwatch = Stopwatch.StartNew();
 
-new Thread(() => 
+new Thread(() =>
 {
     while (true)
     {

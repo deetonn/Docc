@@ -25,7 +25,6 @@ public class ServerConsoleLogger : ILogger
 
     }
 }
-
 public class ClientConsoleLogger : ILogger
 {
     public string Target => "client";

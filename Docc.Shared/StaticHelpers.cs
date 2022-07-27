@@ -28,6 +28,11 @@ public static class StaticHelpers
         Environment.ExitCode = code;
         Environment.Exit(code);
     }
+
+    public static bool ExpectLength<T, T2>(int expected, T real) where T : IEnumerable<T2>
+    {
+        return real.Count() == expected;
+    }
 }
 
 public static class SocketExtensions
@@ -41,7 +46,7 @@ public static class SocketExtensions
         {
             socket.Receive(buffer);
         }
-        catch(SocketException socketException)
+        catch (SocketException socketException)
         {
             return new RequestBuilder()
                 .WithLocation("/internal_error")
@@ -86,6 +91,9 @@ public static class SocketExtensions
         catch (SocketException ex)
         {
             logger?.Log($"failed to send request. ({ex.Message})");
+
+            // at this point we assume they've disconnected.
+            sock?.Dispose();
         }
     }
 
