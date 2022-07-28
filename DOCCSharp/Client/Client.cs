@@ -12,17 +12,9 @@ internal class Client
     protected ClientConnection Connection { get; }
     protected ILogger? _logger;
 
-    public void UseLogger<T>() where T : class, ILogger
+    public void UseLogger<T>() where T : class, ILogger, new()
     {
-        var instance = Activator.CreateInstance(typeof(T));
-
-        if (instance is ILogger logger)
-        {
-            _logger = logger;
-            return;
-        }
-
-        throw new InvalidCastException($"failed to create instance of '{typeof(T).Name}'. Does it have a default constructor?");
+        _logger = new T();
     }
 
     public Client()
