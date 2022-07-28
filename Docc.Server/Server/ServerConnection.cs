@@ -5,26 +5,33 @@ using Newtonsoft.Json;
 
 using Docc.Common.Auth;
 using Docc.Common.Data;
+using Docc.Common.Storage;
 using Docc.Common;
+
 using Docc.Server.Server;
 
 namespace Docc.Server;
-
-/*
- * TODO:
- * 
- * Make the encrypted communications not block the client
- * from connecting.
- */
 
 internal class ServerConnection
 {
     public readonly ILogger Logger;
     private IAuthorizationService _authService;
 
+    // TODO:
+    // when a user connects, make them supply a username + password.
+    // the password should be hashed as soon as they have entered it
+    // and sent to the server via 'IStorageItem'.
+    // Assign them a unique identifier (sort of sessionId)
+    // and append them into _storage
+    private IStorageContainer? _storage;
+
     public void UseAuthorization<T>() where T : IAuthorizationService, new()
     {
         _authService = new T();
+    }
+    public void InitStorage(string path)
+    {
+        _storage = new StorageContainer(path);
     }
 
     public string Version { get; }
@@ -52,10 +59,14 @@ internal class ServerConnection
         Version = Environment.GetEnvironmentVariable("App-Version") ?? "(no version)";
         AppName = Environment.GetEnvironmentVariable("App-Agent") ?? "Docc";
 
+        // TODO:
+        /*
+         * Connections needs to be more in-depth.
+         * Maybe it's own object, that contains Client-Socket keypairs,
+         * but also matches ServerClients to sessionIds.
+         */
         Connections = new Dictionary<ServerClient, Socket>();
 
-        // TODO: replace all console.writeline's with 
-        // a better logging system.
         Logger.Log($"starting server. ({AppName})");
 
         Address = Host.AddressList[1];
@@ -72,7 +83,7 @@ internal class ServerConnection
             {
                 var connection = Socket.Accept();
 
-                // TODO: authenticate the user
+                // TODO: authenticate the user (see field '_storage')
 
                 Request? firstPacket = connection.ReceiveEncrypted(Logger);
                 SharedClient? info;
@@ -183,6 +194,14 @@ internal class ServerConnection
         });
         Validator = new(() =>
         {
+            //  TODO:
+
+            /*
+             * This currently doesn't work, 
+             * when users disconnect, they aren't removed.
+             * Once the overhaul of how we store users in memory is done,
+             * I will fix this. - Deeton
+             */
             while (true)
             {
                 ValidateUsers();
@@ -196,6 +215,11 @@ internal class ServerConnection
         Validator.Start();
     }
 
+    // TODO:
+    /*
+     * Make the delegate also take in the server context. I.E: All users
+     * and a sessionId so it can identify who is making the request.
+     */
     public Action<Request, Socket> OnMessage { get; set; }
         = delegate (Request req, Socket client)
         {
@@ -220,6 +244,12 @@ internal class ServerConnection
 
         foreach (var (user, conn) in Connections)
         {
+            // TODO:
+            /*
+             * 'conn.Connected' will not be set to false until we fail to make a request.
+             * My idea is to automate this, so the client sends a packet before they exit
+             * letting us know they've exited.
+             */
             if (!conn.Connected)
             {
                 schedule.Add(conn);

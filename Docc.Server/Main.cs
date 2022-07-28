@@ -4,7 +4,7 @@ using Docc.Server;
 using System.Text;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
-using System.Net.Sockets;
+using Docc.Server.Server;
 
 Environment.SetEnvironmentVariable("App-Version", "v0.0.4-dev.1");
 Environment.SetEnvironmentVariable("App-Agent", $"Docc {Environment.GetEnvironmentVariable("App-Version")}");

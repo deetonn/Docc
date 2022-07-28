@@ -4,6 +4,13 @@ using Docc.Common.Auth;
 
 namespace Docc.Server;
 
+// TODO:
+
+/*
+ * Not sure how viable this will be as it stands, maybe 'Docc.Shared.Auth.IAuthorizationService'
+ * will need to take in the users credentials and validate via that.
+ */
+
 internal class PrivateServerAuthorization : IAuthorizationService
 {
     public bool Authorize(SharedClient user)
