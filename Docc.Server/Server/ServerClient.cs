@@ -1,6 +1,6 @@
 ﻿using Docc.Common.Data;
 
-namespace Docc.Server;
+namespace Docc.Server.Server;
 
 public class ServerClient
 {

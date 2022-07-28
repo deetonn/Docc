@@ -1,6 +1,6 @@
 ﻿using Docc.Common;
 
-namespace Docc.Server;
+namespace Docc.Server.Server;
 
 internal class CommandLogger : ILogger
 {

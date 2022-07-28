@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using Docc.Common.Auth;
 using Docc.Common.Data;
 using Docc.Common;
+using Docc.Server.Server;
 
 namespace Docc.Server;
 

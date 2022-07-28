@@ -17,13 +17,13 @@ internal class Client
         _logger = new T();
     }
 
-    public Client()
+    public Client(string userName)
     {
         var sessionUid = Guid.NewGuid();
 
         Connection = new ClientConnection(new()
         {
-            Name = "@admin.deeton",
+            Name = userName,
             Id = sessionUid
         });
 

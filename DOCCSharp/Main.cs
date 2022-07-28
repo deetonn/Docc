@@ -3,7 +3,7 @@ using Docc.Client;
 using Docc.Common;
 using System.Diagnostics;
 
-Client Client = new Client();
+Client Client = new("@admin.root");
 
 Client.UseLogger<ClientConsoleLogger>();
 
