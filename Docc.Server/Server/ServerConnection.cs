@@ -9,8 +9,15 @@ using Docc.Common.Storage;
 using Docc.Common;
 
 using Docc.Server.Server;
+using Docc.Server.Data;
 
 namespace Docc.Server;
+
+internal enum ServerType
+{
+    Local,
+    // todo
+}
 
 internal class ServerConnection
 {
@@ -39,7 +46,6 @@ internal class ServerConnection
 
     public Dictionary<ServerClient, Socket> Connections { get; }
 
-    protected Socket Socket { get; }
     protected Thread Listener { get; }
     protected Thread MessageAcceptor { get; }
     protected Thread Validator { get; }
@@ -49,8 +55,17 @@ internal class ServerConnection
     public IPEndPoint Endpoint { get; }                                     // for now
     public IPHostEntry Host { get; set; } = Dns.GetHostEntry("localhost");
 
-    public ServerConnection()
+    private ServerContext Context { get; }
+
+    public ServerContext ContextView()
     {
+        return Context;
+    }
+
+    public ServerConnection(ServerType connType)
+    {
+        InitStorage("saved.json");
+
         Logger = new ServerConsoleLogger();
         _authService = new PrivateServerAuthorization();
 
@@ -65,125 +80,53 @@ internal class ServerConnection
          * Maybe it's own object, that contains Client-Socket keypairs,
          * but also matches ServerClients to sessionIds.
          */
-        Connections = new Dictionary<ServerClient, Socket>();
 
         Logger.Log($"starting server. ({AppName})");
 
-        Address = Host.AddressList[1];
-        Endpoint = new IPEndPoint(Address, 25755);
-        Socket = new Socket(Address.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-        Socket.Bind(Endpoint);
-        Socket.Listen(10);
+        if (connType != ServerType.Local)
+        {
+            throw new NotImplementedException($"ServerType.{connType} is not implemented");
+        }
+
+        Context = ServerContext.Local(25755);
 
         Listener = new(() =>
         {
-            Logger.Log("began accepting clients...");
-
             while (Running)
             {
-                var connection = Socket.Accept();
-
-                // TODO: authenticate the user (see field '_storage')
-
-                Request? firstPacket = connection.ReceiveEncrypted(Logger);
-                SharedClient? info;
-
-                try
-                {
-                    var contents = firstPacket?.Content.FirstOrDefault();
-
-                    if (contents is null)
-                    {
-                        // client didn't send the first packet, which we expected.
-                        // chances are it's not our client or they're lagging.
-                        Logger?.Log($"client contents were null.");
-
-                        var rejection = new RequestBuilder()
-                            .WithLocation(Request.DefaultLocation)
-                            .WithResult(RequestResult.BadPacket)
-                            .AddContent("Request data was null.");
-
-                        connection.SendEncrypted(rejection.Build());
-
-                        connection.Close();
-                        continue;
-                    }
-
-                    info = JsonConvert.DeserializeObject<SharedClient>(contents);
-                }
-                catch (JsonException)
-                {
-                    // we failed to deserialize the first packet. Just reject the
-                    // connection.
-
-                    // sending random stuff instantly grants you a fuck off
-                    Logger?.Log("failed to deserialize request contents.");
-
-                    var rb = new RequestBuilder()
-                        .WithLocation(Request.DefaultLocation)
-                        .WithResult(RequestResult.BadPacket)
-                        .AddContent("failed to authenticate.");
-
-                    connection.SendEncrypted(rb.Build());
-                    connection.Close();
-                    continue;
-                }
-
-                if (info is not SharedClient user)
-                {
-                    Logger?.Log("client sent invalid ServerClient object");
-                    connection.Close();
-                    continue;
-                }
-
-                if (!_authService?.Authorize(user) ?? false)
-                {
-                    Logger?.Log($"user '{user.Name}' failed authentication.");
-                    connection.SendEncrypted(
-                        new RequestBuilder()
-                            .WithLocation(Request.DefaultLocation)
-                            .WithResult(RequestResult.NotAuthorized)
-                            .AddContent("Failed to authorize you.")
-                            .Build());
-                    connection.Close();
-                    continue;
-                }
-
-                Connections.Add(ServerClient.From(user), connection);
-
-                Logger?.Log($"accepted client '{user.Name}'");
-
-                var accepted = new RequestBuilder()
-                    .WithLocation("/")
-                    .AddContent($"{user.Id}")
-                    .WithResult(RequestResult.OK)
-                    .Build();
-
-                connection.SendEncrypted(accepted);
+                var newConnection = Context.Socket.Accept();
             }
         });
         MessageAcceptor = new(() =>
         {
             while (Running)
             {
-                SpinWait.SpinUntil(() => Connections.Any(x => x.Value.Available > 0));
-                var clientsWhoSentMessages = Connections.Where(x => x.Value.Available > 0);
-                Logger.Log($"accepting {clientsWhoSentMessages.Count()} requests...");
+                SpinWait.SpinUntil(() => Context.Connections.Any(x => x.Socket.Available > 0));
+                var clientsWhoSentMessages = Context.Connections.Where(x => x.Socket.Available > 0);
 
                 List<(Request?, Socket)> sentMessages = new();
 
                 foreach (var client in clientsWhoSentMessages)
                 {
-                    var message = client.Value.ReceiveEncrypted();
-
-                    if (message?.Result == RequestResult.Disconnecting)
+                    if (client.Socket is null)
                     {
-                        Logger?.Log($"{client.Key.Name} has disconnected.");
-                        Connections.Remove(client.Key);
+                        // why the fuck is it null
                         continue;
                     }
 
-                    sentMessages.Add((message, client.Value));
+                    var message = client.Socket?.ReceiveEncrypted()
+                        ?? Request.Default;
+
+                    if (message?.Result == RequestResult.Disconnecting)
+                    {
+                        Logger?.Log($"{client.Client?.Name} has disconnected.");
+                        Context.Connections.Remove(client);
+                        continue;
+                    }
+
+                    // `client.Socket` will not be null, as it's checked above.
+                    // the `throw null!` is there to tell IDE's to stfu
+                    sentMessages.Add((message, client.Socket ?? throw null!));
                 }
 
                 foreach (var sentMessage in sentMessages)
@@ -224,6 +167,12 @@ internal class ServerConnection
         = delegate (Request req, Socket client)
         {
 
+        };
+
+    public Func<Connection, bool> OnConnection { get; set; }
+        = delegate (Connection conn)
+        {
+            return true;
         };
 
     public void EditUser(string nameOrId, Func<ServerClient, ServerClient> man)
