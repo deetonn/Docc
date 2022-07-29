@@ -1,13 +1,10 @@
 ﻿global using static Docc.Common.StaticHelpers;
 using Docc.Client;
 using Docc.Common;
-using System.Diagnostics;
 
 Client Client = new("@admin.root");
 
 Client.UseLogger<ClientConsoleLogger>();
-
-Stopwatch Stopwatch = Stopwatch.StartNew();
 
 new Thread(() =>
 {
