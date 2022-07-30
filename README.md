@@ -1,5 +1,5 @@
 # Docc :newspaper:
-An example of client-server connections built from scratch. This project contains multi-threading networking, login system, session ids to track who the server is talking to, requests sent in json format that are able to contain anything and complete freedom in adding new endpoints.
+An example of client-server connections built from scratch. This project contains multi-threaded networking, login system, session ids to track who the server is talking to, requests sent in json format that are able to contain anything and complete freedom in adding new endpoints.
 
 ## Client example
 
