@@ -10,7 +10,7 @@ using Docc.Common.Storage;
 
 Client client;
 
-if (!DoccClient.Create("user", StorageUtil.Sha256Hash("pass"), out client){
+if (!DoccClient.Create("user", "pass", out client){
 	Console.WriteLine("failed to connect to the server.");
 	Environment.Exit(-1);
 }
