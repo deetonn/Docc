@@ -60,7 +60,7 @@ public enum RequestResult : ushort
     Disconnecting,
 
     /*
-     * Occurs when the a request timed out.
+     * Occurs when a request timed out.
      */
     TimedOut,
 
