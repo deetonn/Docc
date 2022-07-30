@@ -253,6 +253,19 @@ internal class ServerConnection
                         continue;
                     }
 
+                    if (!connection?.SessionKey.IsValid ?? false)
+                    {
+                        // probably handle this better
+
+                        var badSession = new RequestBuilder()
+                            .WithResult(RequestResult.ExpiredCredentials)
+                            .AddContent("your session credentials have expired.")
+                            .Build();
+
+                        connection?.Socket?.SendRequest(badSession);
+                        continue;
+                    }
+
                     if (message?.Result == RequestResult.Disconnecting)
                     {
                         Logger?.Log($"{client.Client?.Name} has disconnected.");

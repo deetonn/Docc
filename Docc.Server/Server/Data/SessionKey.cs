@@ -24,7 +24,7 @@ internal class SessionKey
     public DateTime ExpiresAt { get; private set; }
 
     public bool IsValid
-        => ExpiresAt < DateTime.Now;
+        => ExpiresAt > DateTime.Now;
 
     public void Invalidate()
     {
