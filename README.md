@@ -8,7 +8,9 @@ using Docc.Client;
 using Docc.Common;
 using Docc.Common.Storage;
 
-if (!DoccClient.Create("user", StorageUtil.Sha256Hash("pass"), out var client){
+Client client;
+
+if (!DoccClient.Create("user", StorageUtil.Sha256Hash("pass"), out client){
 	Console.WriteLine("failed to connect to the server.");
 	Environment.Exit(-1);
 }
