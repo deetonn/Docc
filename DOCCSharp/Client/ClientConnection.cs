@@ -24,8 +24,6 @@ internal class ClientConnection
     {
         _logger = new ClientConsoleLogger();
 
-        // at this point, if the local user is banned, they are gone.
-
         Address = Entry.AddressList[1];
         ServerEndpoint = new IPEndPoint(Address, 25755);
         Socket = new Socket(Address.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
@@ -54,8 +52,6 @@ internal class ClientConnection
             Exit(0);
         }
 
-        // We're connected, instantly send the client info over.
-
         _logger.Log($"resolved host [{ServerEndpoint.Address}:{ServerEndpoint.Port}, {ServerEndpoint.AddressFamily}]");
 
         var rb = new RequestBuilder()
@@ -66,7 +62,6 @@ internal class ClientConnection
 
         if (status is null)
         {
-            // tf?
             _logger.Log("server failed to respond with handshake.");
             Exit(0);
             // so IDE's can see that beyond this point status will not
