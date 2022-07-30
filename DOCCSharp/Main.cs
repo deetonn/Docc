@@ -1,6 +1,7 @@
 ﻿global using static Docc.Common.StaticHelpers;
 using Docc.Client;
 using Docc.Common;
+using Docc.Common.Storage;
 
 var user = string.Empty;
 var pass = string.Empty;
@@ -31,7 +32,7 @@ do
         }
     } while (key != ConsoleKey.Enter);
 }
-while (!DoccClient.Create(user!, pass!, out client));
+while (!DoccClient.Create(user!, StorageUtil.Sha256Hash(pass!), out client));
 
 client.UseLogger<ClientConsoleLogger>();
 
