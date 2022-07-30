@@ -8,11 +8,13 @@ namespace Docc.Common.Storage;
 
 public interface IStorageContainer
 {
-    IList<IStorageItem> SavedItems { get; }
+    IList<StorageItem> SavedItems { get; }
 
-    public bool Add(IStorageItem item);
+    public bool Add(StorageItem item);
 
-    public int Contains(IStorageItem item);
+    public int Contains(StorageItem item);
+
+    public StorageItem? Get(string userName);
 
     public void Save();
 }

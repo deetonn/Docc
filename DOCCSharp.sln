@@ -12,6 +12,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F41C9837-CEBD-4B39-A14D-800F707E8A68}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		client.bat = client.bat
+		server.bat = server.bat
 		test.bat = test.bat
 	EndProjectSection
 EndProject

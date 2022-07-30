@@ -1,5 +1,6 @@
 ﻿using Docc.Common;
 using Docc.Common.Data;
+using Docc.Common.Storage;
 using Newtonsoft.Json;
 using System.Net;
 using System.Net.Sockets;
@@ -16,7 +17,7 @@ internal class ClientConnection
     public IPHostEntry Entry { get; } = Dns.GetHostEntry("localhost");
     public IPEndPoint ServerEndpoint { get; }
 
-    public ClientConnection(SharedClient client)
+    public ClientConnection(string userName, string password)
     {
         _logger = new ClientConsoleLogger();
 
@@ -55,11 +56,9 @@ internal class ClientConnection
         _logger.Log($"resolved host [{ServerEndpoint.Address}:{ServerEndpoint.Port}, {ServerEndpoint.AddressFamily}]");
 
         var rb = new RequestBuilder()
-            .WithLocation("/")
-            .AddContent(JsonConvert.SerializeObject(client));
+            .WithArguments(new() { { "userName", userName }, { "hashedPw", StorageUtil.Sha256Hash(password) } });
 
         Socket.SendEncrypted(rb.Build(), _logger);
-
         var status = Socket.ReceiveEncrypted(_logger);
 
         if (status is null)
@@ -76,30 +75,6 @@ internal class ClientConnection
         {
             _logger.Log($"server rejected the connection with reason: {Translation.From(status.Result).Conversion}");
             Exit(-1);
-        }
-
-        // If it's an Okay(), we need to make sure the server sent
-        // our Guid back.
-
-        var guid = status.Content.FirstOrDefault();
-
-        if (guid is null)
-        {
-            _logger.Log("server failed to provide valid handshake.");
-            Environment.Exit(-1);
-            return;
-        }
-
-        if (!Guid.TryParse(guid, out var id))
-        {
-            _logger.Log("server failed to provide valid handshake.");
-            Environment.Exit(-1);
-            return;
-        }
-
-        if (client.Id != id)
-        {
-            _logger.Log("server failed to provide valid handshake.");
         }
 
         _logger.Log("connected to server!");

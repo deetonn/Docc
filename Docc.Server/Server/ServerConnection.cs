@@ -4,12 +4,12 @@ using System.Net.Sockets;
 using Newtonsoft.Json;
 
 using Docc.Common.Auth;
-using Docc.Common.Data;
 using Docc.Common.Storage;
 using Docc.Common;
 
 using Docc.Server.Server;
 using Docc.Server.Data;
+using Docc.Server.Server.Auth;
 
 namespace Docc.Server;
 
@@ -31,6 +31,12 @@ internal class ServerConnection
     // Assign them a unique identifier (sort of sessionId)
     // and append them into _storage
     private IStorageContainer? _storage;
+
+    public void AddUser(string name, string pw)
+    {
+        _storage?.Add(new(name, pw));
+        Task.Run(() => _storage?.Save());
+    }
 
     public void UseAuthorization<T>() where T : IAuthorizationService, new()
     {
@@ -94,7 +100,94 @@ internal class ServerConnection
         {
             while (Running)
             {
+                // Socket
                 var newConnection = Context.Socket.Accept();
+
+                Logger.Log("accepted client");
+
+                // could block this thread..
+                var firstPacket = newConnection.ReceiveEncrypted();
+
+                if (firstPacket is null)
+                {
+                    // failed to deserialize initial packet,
+                    // fuck off!
+
+                    var rejection = new RequestBuilder()
+                        .WithResult(RequestResult.BadPacket)
+                        .Build();
+
+                    newConnection.SendRequest(rejection);
+                    newConnection.Dispose();
+                    continue;
+                }
+
+                if (firstPacket == Request.Timeout)
+                {
+                    // failed to accept first request
+                    // fuck off!
+
+                    var rb = new RequestBuilder()
+                        .WithResult(RequestResult.Disconnecting)
+                        .AddContent("Failed to respond to initial packet.")
+                        .Build();
+
+                    newConnection.SendRequest(rb);
+                    newConnection.Dispose();
+                    continue;
+                }
+
+                if ((!firstPacket.Arguments.ContainsKey("userName"))
+                    || (!firstPacket.Arguments.ContainsKey("hashedPw")))
+                {
+                    // bad request
+                    newConnection.SendRequest(
+                        new RequestBuilder()
+                            .WithResult(RequestResult.BadCredentials)
+                            .Build()
+                    );
+                    newConnection?.Dispose();
+                    continue;
+                }
+
+                var userName = firstPacket.Arguments["userName"];
+                var hashedPw = firstPacket.Arguments["hashedPw"];
+
+                if (_storage?.Contains(new StorageItem(userName, hashedPw)) != 0)
+                {
+                    newConnection.SendRequest(
+                        new RequestBuilder()
+                            .AddContent("That username or password is not recognized.")
+                            .WithResult(RequestResult.BadCredentials)
+                            .Build()
+                    );
+
+                    newConnection?.Dispose();
+                    continue;
+                }
+
+                // at this point we know who we're talking to
+
+                var connection = new Connection
+                {
+                    Client = _storage.Get(userName),
+                    Socket = newConnection,
+                    SessionKey = new()
+                };
+
+                if (!OnConnection(connection))
+                {
+                    newConnection.SendRequest(
+                        new RequestBuilder()
+                        .WithResult(RequestResult.NotAuthorized)
+                        .Build()
+                    );
+                    connection.Dispose();
+                    continue;
+                }
+
+                Context.Connections.Add(connection);
+                newConnection.SendRequest(new RequestBuilder().WithResult(RequestResult.OK).Build());
             }
         });
         MessageAcceptor = new(() =>
@@ -185,27 +278,28 @@ internal class ServerConnection
         Connections.Add(man(user.Key), user.Value);
     }
 
-    // iterate all users & remove any who's connection
-    // has dropped.
+    /*
+     * TODO: fix
+     */
     private void ValidateUsers()
     {
-        List<Socket> schedule = new();
+        //List<Socket> schedule = new();
 
-        foreach (var (user, conn) in Connections)
-        {
-            // TODO:
-            /*
-             * 'conn.Connected' will not be set to false until we fail to make a request.
-             * My idea is to automate this, so the client sends a packet before they exit
-             * letting us know they've exited.
-             */
-            if (!conn.Connected)
-            {
-                schedule.Add(conn);
-                Logger.Log($"client '{user.Name}' has disconnected.");
-            }
-        }
+        //foreach (var (user, conn) in Connections)
+        //{
+        //    // TODO:
+        //    /*
+        //     * 'conn.Connected' will not be set to false until we fail to make a request.
+        //     * My idea is to automate this, so the client sends a packet before they exit
+        //     * letting us know they've exited.
+        //     */
+        //    if (!conn.Connected)
+        //    {
+        //        schedule.Add(conn);
+        //        Logger.Log($"client '{user.Name}' has disconnected.");
+        //    }
+        //}
 
-        schedule.ForEach(conn => conn.Close());
+        //schedule.ForEach(conn => conn.Close());
     }
 }

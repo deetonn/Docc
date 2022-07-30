@@ -60,16 +60,27 @@ public enum RequestResult : ushort
     Disconnecting,
 
     /*
+     * Occurs when the a request timed out.
+     */
+    TimedOut,
+
+    /*
      * Just a 404 error. This tells the receiver the specified content
      * was not found.
      */
     ContentNotFound = 404,
 
     /*
+     * Unrecognized username and or password
+     */
+
+    BadCredentials,
+
+    /*
      * An error that specifies that you specified incorrect
      * arguments to an endpoint.
      */
-    BadArguments = 405
+    BadArguments = 406
 }
 
 public class Translation
@@ -88,7 +99,9 @@ public class Translation
             { RequestResult.BadPacket, "One or more packets were malformed or invalid." },
             { RequestResult.NotAuthorized, "You do not have the permissions to do this." },
             { RequestResult.BadArguments, "You specified incorrect arguments to an endpoint." },
-            { RequestResult.Disconnecting, "The sender is disconnecting." }
+            { RequestResult.Disconnecting, "The sender is disconnecting." },
+            { RequestResult.BadCredentials, "The credentials you supplied are invalid." },
+            { RequestResult.TimedOut, "The connection timed out." }
         };
 
     public RequestResult Original { get; init; }

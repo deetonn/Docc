@@ -5,6 +5,8 @@ using System.Text;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using Docc.Server.Server;
+using Docc.Server.Server.Auth;
+using Docc.Common.Storage;
 
 Environment.SetEnvironmentVariable("App-Version", "v0.0.4-dev.1");
 Environment.SetEnvironmentVariable("App-Agent", $"Docc {Environment.GetEnvironmentVariable("App-Version")}");
@@ -63,6 +65,22 @@ connection.OnMessage = (req, client) =>
     var response = manager.CallMappedLocal(req.Location, req.Arguments);
     client.SendRequest(response);
 };
+
+context.Add("user.create", (args, logger) =>
+{
+    if (!(args.Length == 2))
+    {
+        logger.Log("usage: user.create <name> <password>");
+        return;
+    }
+
+    var user = args[0];
+    var pass = StorageUtil.Sha256Hash(args[1]);
+
+    connection.AddUser(user, pass);
+
+    logger.Log($"created user. [{user}, {args[1]}]");
+});
 
 while (true)
 {

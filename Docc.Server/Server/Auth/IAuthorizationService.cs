@@ -1,4 +1,4 @@
-﻿using Docc.Common.Data;
+﻿using Docc.Server.Data;
 
 namespace Docc.Common.Auth;
 
@@ -6,7 +6,7 @@ namespace Docc.Common.Auth;
 /// Provides a generic authorization service.
 /// Must contain a parameterless constructor 
 /// </summary>
-public interface IAuthorizationService
+internal interface IAuthorizationService
 {
-    public bool Authorize(SharedClient @user);
+    public bool Authorize(Connection @user);
 }

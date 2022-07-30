@@ -1,8 +1,9 @@
 ﻿using Docc.Common;
 using Docc.Common.Data;
 using Docc.Common.Auth;
+using Docc.Server.Data;
 
-namespace Docc.Server;
+namespace Docc.Server.Server.Auth;
 
 // TODO:
 
@@ -13,7 +14,7 @@ namespace Docc.Server;
 
 internal class PrivateServerAuthorization : IAuthorizationService
 {
-    public bool Authorize(SharedClient user)
+    public bool Authorize(Connection user)
     {
         /*
          * obviously a silly example,
@@ -23,12 +24,12 @@ internal class PrivateServerAuthorization : IAuthorizationService
          * to contain data needed to verify the
          * connection.
          */
-        return user.Name.StartsWith("@admin.");
+        return user.Client?.Name?.StartsWith("@admin.") ?? false;
     }
 }
 internal class NoServerAuthorization : IAuthorizationService
 {
-    public bool Authorize(SharedClient _)
+    public bool Authorize(Connection _)
     {
         /*
          * obviously a silly example,

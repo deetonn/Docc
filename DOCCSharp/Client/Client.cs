@@ -17,15 +17,11 @@ internal class Client
         _logger = new T();
     }
 
-    public Client(string userName)
+    public Client(string user, string pw)
     {
         var sessionUid = Guid.NewGuid();
 
-        Connection = new ClientConnection(new()
-        {
-            Name = userName,
-            Id = sessionUid
-        });
+        Connection = new ClientConnection(user, pw);
 
         var rb = new RequestBuilder()
             .WithAgent("Docc AdminClient")

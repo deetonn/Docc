@@ -6,14 +6,23 @@ using System.Threading.Tasks;
 
 namespace Docc.Common.Storage;
 
-public class StorageItem : IStorageItem
+// interact with the users storage item without having access to 
+// their password
+public interface ISafeItem
+{
+    public string? Name { get; set; }
+    public Guid UserId { get; set; }
+}
+
+public class StorageItem : ISafeItem
 {
     public StorageItem(string? name, string? hashedPassword)
-        : base(name, hashedPassword)
     {
+        Name = name;
+        HashedPassword = hashedPassword;
     }
 
-    public override string? Name { get; init; }
-
-    public override string? HashedPassword { get; init; }
+    public virtual string? Name { get; set; }
+    public virtual string? HashedPassword { get; set; }
+    public virtual Guid UserId { get; set; } = Guid.NewGuid();
 }

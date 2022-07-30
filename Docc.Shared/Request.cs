@@ -68,6 +68,12 @@ public class Request
             .WithLocation("/")
             .WithResult(RequestResult.BadPacket)
             .Build();
+
+    public static Request Timeout
+        => new RequestBuilder()
+            .WithLocation("/")
+            .WithResult(RequestResult.TimedOut)
+            .Build();
 }
 
 // Just makes things look easier on the eyes when making a client/server.
