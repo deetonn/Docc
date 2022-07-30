@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using Docc.Server.Server;
 using Docc.Server.Server.Auth;
 using Docc.Common.Storage;
+using Docc.Server.Endpoints;
 
 Environment.SetEnvironmentVariable("App-Version", "v0.0.4-dev.1");
 Environment.SetEnvironmentVariable("App-Agent", $"Docc {Environment.GetEnvironmentVariable("App-Version")}");
@@ -58,12 +59,70 @@ connection.UseAuthorization<PrivateServerAuthorization>();
 Random serverRng = new();
 var version = Environment.GetEnvironmentVariable("App-Version")!;
 
+/*
+ * ENDPOINTS:
+ * 
+ * All endpoints the client can be served by are here
+ */
+
+manager.MapGet("/api/v1/ping", (args, conn) =>
+{
+    return new RequestBuilder()
+        .WithResult(RequestResult.OK)
+        .AddContent("Pong!")
+        .Build();
+});
+
+
+/*
+ * COMMANDS:
+ * 
+ * Server commands, things you can type into the server console
+ */
+
+context.Add("connections", (args, logger) =>
+{
+    var view = connection.ContextView();
+
+    if (!view.Connections.Any())
+    {
+        logger.Log("there is currently zero people connected.");
+        return;
+    }
+
+    var connections = view.Connections;
+
+    foreach (var conn in connections)
+    {
+        logger.Log($"[{conn.Client?.Name}, {{uuid: {conn.Client?.UserId}}}] - sessionId: {conn.SessionKey.Value} (expires at {conn.SessionKey.ExpiresAt.ToLongTimeString()})");
+    }
+});
+context.Add("invalidate", (args, logger) =>
+{
+    if (!(args.Length == 1))
+    {
+        logger.Log("usage: invalidate <user-id> [will invalidate a users session token]");
+        return;
+    }
+
+    var uid = args[0];
+    var view = connection.ContextView();
+
+    if (!view.TryGetUserById(uid, out var user))
+    {
+        logger.Log("no user connected with that id");
+        return;
+    }
+
+    user?.SessionKey.Invalidate();
+});
+
 connection.OnMessage = (req, client) =>
 {
     //connection.Logger.Log($"received request for '{req.Location}'");
 
     var response = manager.CallMappedLocal(req.Location, req.Arguments);
-    client.SendRequest(response);
+    client.Socket?.SendRequest(response);
 };
 
 context.Add("user.create", (args, logger) =>

@@ -77,10 +77,16 @@ public enum RequestResult : ushort
     BadCredentials,
 
     /*
+     * In the case that the users session key has expired.
+     */
+
+    ExpiredCredentials,
+
+    /*
      * An error that specifies that you specified incorrect
      * arguments to an endpoint.
      */
-    BadArguments = 406
+    BadArguments
 }
 
 public class Translation
@@ -101,7 +107,8 @@ public class Translation
             { RequestResult.BadArguments, "You specified incorrect arguments to an endpoint." },
             { RequestResult.Disconnecting, "The sender is disconnecting." },
             { RequestResult.BadCredentials, "The credentials you supplied are invalid." },
-            { RequestResult.TimedOut, "The connection timed out." }
+            { RequestResult.TimedOut, "The connection timed out." },
+            { RequestResult.ExpiredCredentials, "You supplied invalid credentials. Your session might have expired." }
         };
 
     public RequestResult Original { get; init; }

@@ -29,4 +29,41 @@ internal class ServerContext
     public IPEndPoint Endpoint { get; init; }
 
     public Socket Socket { get; init; }
+
+    public bool SessionUser(string sessionId, out Connection? conn)
+    {
+        if (!Connections.Where(x => x.SessionKey.Value.ToString() == sessionId).Any())
+        {
+            conn = null;
+            return false;
+        }
+
+        conn = Connections.Where(x => x.SessionKey.Value.ToString() == sessionId).First();
+        return true;
+    }
+    public bool SessionUser(Guid sessionId, out Connection? conn)
+    {
+        if (!Connections.Where(x => x.SessionKey.Value == sessionId).Any())
+        {
+            conn = null;
+            return false;
+        }
+
+        conn = Connections.Where(x => x.SessionKey.Value == sessionId).First();
+        return true;
+    }
+
+    public bool TryGetUserById(string userId, out Connection? conn)
+    {
+        var users = Connections.Where(x => x.Client?.UserId.ToString() == userId);
+
+        if (!users.Any())
+        {
+            conn = null;
+            return false;
+        }
+
+        conn = users.First();
+        return true;
+    }
 }

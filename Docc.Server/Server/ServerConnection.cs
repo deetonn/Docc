@@ -50,11 +50,8 @@ internal class ServerConnection
     public string Version { get; }
     public string AppName { get; }
 
-    public Dictionary<ServerClient, Socket> Connections { get; }
-
     protected Thread Listener { get; }
     protected Thread MessageAcceptor { get; }
-    protected Thread Validator { get; }
     protected bool Running { get; } = true;
 
     public IPAddress Address { get; }
@@ -102,8 +99,6 @@ internal class ServerConnection
             {
                 // Socket
                 var newConnection = Context.Socket.Accept();
-
-                Logger.Log("accepted client");
 
                 // could block this thread..
                 var firstPacket = newConnection.ReceiveEncrypted();
@@ -186,8 +181,19 @@ internal class ServerConnection
                     continue;
                 }
 
-                Context.Connections.Add(connection);
-                newConnection.SendRequest(new RequestBuilder().WithResult(RequestResult.OK).Build());
+                // We want to send the client their sessionId.
+                // So that any future requests can verify them that way.
+
+                Logger.Log($"accepted client `{connection?.Client?.Name}`");
+
+                Context.Connections.Add(connection!);
+
+                var sessionIdRequest = new RequestBuilder()
+                    .WithResult(RequestResult.OK)
+                    .WithArguments(new() { { "session_id", connection!.SessionKey.Value.ToString() } });
+
+                // This tells the client they're connected.
+                connection.Socket.SendRequest(sessionIdRequest.Build());
             }
         });
         MessageAcceptor = new(() =>
@@ -197,7 +203,7 @@ internal class ServerConnection
                 SpinWait.SpinUntil(() => Context.Connections.Any(x => x.Socket.Available > 0));
                 var clientsWhoSentMessages = Context.Connections.Where(x => x.Socket.Available > 0);
 
-                List<(Request?, Socket)> sentMessages = new();
+                List<(Request, Connection)> sentMessages = new();
 
                 foreach (var client in clientsWhoSentMessages)
                 {
@@ -210,6 +216,43 @@ internal class ServerConnection
                     var message = client.Socket?.ReceiveEncrypted()
                         ?? Request.Default;
 
+                    // In this case, the client hasn't even supplied
+                    // a session key argument.
+                    if (!message.Arguments.ContainsKey("session_id"))
+                    {
+                        // deny the request.
+
+                        var badCreds = new RequestBuilder()
+                            .WithResult(RequestResult.BadCredentials)
+                            .AddContent("client didn't supply session id.")
+                            .Build();
+
+                        client?.Socket?.SendRequest(badCreds);
+
+                        return;
+                    }
+
+                    var suppliedSessionKey = message.Arguments["session_id"];
+
+                    // In this case, they've supplied an invalid (or old key).
+                    if (!Context.SessionUser(suppliedSessionKey, out Connection? connection))
+                    {
+                        // Maybe create temporary (not saved to disk) storage of
+                        // each users past session ids. Then in this case, we can 
+                        // check if they're a real client or not. If an old session key
+                        // is provided, supply them with a new??
+
+                        // ^^^ just an idea.
+
+                        var badSession = new RequestBuilder()
+                            .WithResult(RequestResult.ExpiredCredentials)
+                            .AddContent("your session credentials have expired.")
+                            .Build();
+
+                        client.Socket?.SendRequest(badSession);
+                        continue;
+                    }
+
                     if (message?.Result == RequestResult.Disconnecting)
                     {
                         Logger?.Log($"{client.Client?.Name} has disconnected.");
@@ -219,36 +262,18 @@ internal class ServerConnection
 
                     // `client.Socket` will not be null, as it's checked above.
                     // the `throw null!` is there to tell IDE's to stfu
-                    sentMessages.Add((message, client.Socket ?? throw null!));
+                    sentMessages.Add((message!, connection!));
                 }
 
                 foreach (var sentMessage in sentMessages)
                 {
-                    OnMessage(sentMessage.Item1 ?? Request.Default, sentMessage.Item2);
+                    OnMessage(sentMessage.Item1, sentMessage.Item2);
                 }
-            }
-        });
-        Validator = new(() =>
-        {
-            //  TODO:
-
-            /*
-             * This currently doesn't work, 
-             * when users disconnect, they aren't removed.
-             * Once the overhaul of how we store users in memory is done,
-             * I will fix this. - Deeton
-             */
-            while (true)
-            {
-                ValidateUsers();
-                // not ideal, but does its job for the time being.
-                Thread.Sleep(TimeSpan.FromSeconds(5));
             }
         });
 
         Listener.Start();
         MessageAcceptor.Start();
-        Validator.Start();
     }
 
     // TODO:
@@ -256,10 +281,14 @@ internal class ServerConnection
      * Make the delegate also take in the server context. I.E: All users
      * and a sessionId so it can identify who is making the request.
      */
-    public Action<Request, Socket> OnMessage { get; set; }
-        = delegate (Request req, Socket client)
+    public Action<Request, Connection> OnMessage { get; set; }
+        = delegate (Request request, Connection conn)
         {
-
+            conn.Socket?.SendRequest(
+                new RequestBuilder()
+                    .WithResult(RequestResult.GenericError)
+                    .AddContent("You have not set Server.OnMessage to a custom message handler!")
+                    .Build());
         };
 
     public Func<Connection, bool> OnConnection { get; set; }
@@ -267,39 +296,4 @@ internal class ServerConnection
         {
             return true;
         };
-
-    public void EditUser(string nameOrId, Func<ServerClient, ServerClient> man)
-    {
-        if (Connections.Any(x => x.Key.Name == nameOrId || x.Key.Id.ToString() == nameOrId))
-            return;
-
-        var user = Connections.Where(x => x.Key.Name == nameOrId || x.Key.Id.ToString() == nameOrId).First();
-        Connections.Remove(user.Key);
-        Connections.Add(man(user.Key), user.Value);
-    }
-
-    /*
-     * TODO: fix
-     */
-    private void ValidateUsers()
-    {
-        //List<Socket> schedule = new();
-
-        //foreach (var (user, conn) in Connections)
-        //{
-        //    // TODO:
-        //    /*
-        //     * 'conn.Connected' will not be set to false until we fail to make a request.
-        //     * My idea is to automate this, so the client sends a packet before they exit
-        //     * letting us know they've exited.
-        //     */
-        //    if (!conn.Connected)
-        //    {
-        //        schedule.Add(conn);
-        //        Logger.Log($"client '{user.Name}' has disconnected.");
-        //    }
-        //}
-
-        //schedule.ForEach(conn => conn.Close());
-    }
 }

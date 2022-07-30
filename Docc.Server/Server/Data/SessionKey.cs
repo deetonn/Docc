@@ -21,8 +21,13 @@ internal class SessionKey
     /// The time this session expires, the <see cref="SessionKey"/> will need
     /// to be renewed after this expires.
     /// </summary>
-    public DateTime ExpiresAt { get; }
+    public DateTime ExpiresAt { get; private set; }
 
-    public bool IsValid()
+    public bool IsValid
         => ExpiresAt < DateTime.Now;
+
+    public void Invalidate()
+    {
+        ExpiresAt = DateTime.Now;
+    }
 }

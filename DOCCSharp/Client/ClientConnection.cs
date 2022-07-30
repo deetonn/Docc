@@ -13,6 +13,9 @@ internal class ClientConnection
 
     protected Socket Socket { get; }
 
+    public bool Connected { get; private set; } = false;
+    public string SessionId { get; private set; } = string.Empty;
+
     public IPAddress Address { get; }
     public IPHostEntry Entry { get; } = Dns.GetHostEntry("localhost");
     public IPEndPoint ServerEndpoint { get; }
@@ -78,6 +81,8 @@ internal class ClientConnection
         }
 
         _logger.Log("connected to server!");
+        Connected = true;
+        SessionId = status.Arguments["session_id"];
     }
 
     public Request? MakeRequest(Request query)

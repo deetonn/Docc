@@ -1,16 +1,18 @@
-﻿using Docc.Common.Data;
+﻿using Docc.Common;
+using Docc.Common.Data;
+using Docc.Server.Data;
 
-namespace Docc.Common;
+namespace Docc.Server.Endpoints;
 
 /*
  * 
  */
 
-public delegate Request ContentCallback(Dictionary<string, string> args, SharedSenderInfo info);
+internal delegate Request ContentCallback(Dictionary<string, string> args, Connection conn);
 
-public record DirectoryListing(string Location, ContentCallback Responder);
+internal record DirectoryListing(string Location, ContentCallback Responder);
 
-public class DirectoryListingManager
+internal class DirectoryListingManager
 {
     public List<DirectoryListing> ActiveListings { get; set; }
         = new List<DirectoryListing>();
@@ -26,16 +28,23 @@ public class DirectoryListingManager
         ActiveListings.Add(new DirectoryListing(Location, callback));
     }
 
+    /*
+     * TODO:
+     * 
+     * The below functions are kind of redundant.
+     * They could be implemented much better, their names also make no sense.
+     */
+
     /// <summary>
     /// automatically serves <paramref name="info"/> to the specified <paramref name="location"/>
     /// </summary>
     /// <param name="location">The mapped callback to search for</param>
     /// <param name="info">The sender information, the person to serve <paramref name="location"/> to.</param>
-    public void CallMappedOnline(string location, Dictionary<string, string> args, SharedSenderInfo info)
+    public void CallMappedOnline(string location, Dictionary<string, string> args, Connection info)
     {
         if (!ActiveListings.Any(ActiveListings.Contains))
         {
-            info.Serve(new Request { Location = "/404" });
+            info.Socket?.SendRequest(new Request { Location = "/404" });
             return;
         }
 
@@ -45,7 +54,7 @@ public class DirectoryListingManager
             .Responder
             .Invoke(args, info);
 
-        info.Serve(response);
+        info.Socket?.SendRequest(response);
     }
 
     public Request CallMappedLocal(string location, Dictionary<string, string> args)
