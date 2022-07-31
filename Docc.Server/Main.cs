@@ -1,5 +1,4 @@
-﻿using static Docc.Common.StaticHelpers;
-using Docc.Common;
+﻿using Docc.Common;
 using Docc.Server;
 using System.Text;
 using System.ComponentModel;
