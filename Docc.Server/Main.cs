@@ -1,4 +1,6 @@
-﻿using Docc.Common;
+﻿using static Docc.Common.StaticHelpers;
+
+using Docc.Common;
 using Docc.Server;
 using System.Text;
 using System.ComponentModel;
@@ -14,6 +16,8 @@ Environment.SetEnvironmentVariable("App-Agent", $"Docc {Environment.GetEnvironme
 DirectoryListingManager manager = new();
 ServerConnection connection = new(ServerType.Local);
 CommandList context = new(new CommandLogger());
+
+connection.UseLogger<ServerConsoleLogger>();
 
 AppDomain.CurrentDomain.ProcessExit += (sender, e) =>
 {
@@ -71,7 +75,22 @@ manager.MapGet("/api/v1/ping", (args, conn) =>
         .AddContent("Pong!")
         .Build();
 });
+manager.MapGet("/api/v1/disconnect", (args, conn) =>
+{
+    // simply terminate their session ID
+    // don't really care about closing the socket.
 
+    // to ensure the socket doesn't die before 
+    // returning the Ok
+    RunIn(5, () =>
+    {
+        conn.Disconnect();
+    });
+
+    return new RequestBuilder()
+        .WithResult(RequestResult.OK)
+        .Build();
+});
 
 /*
  * COMMANDS:

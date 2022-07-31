@@ -32,7 +32,7 @@ do
         }
     } while (key != ConsoleKey.Enter);
 }
-while (!DoccClient.Create(user!, StorageUtil.Sha256Hash(pass!), out client));
+while (!DoccClient.Create(user!, pass!, out client));
 
 client.UseLogger<ClientConsoleLogger>();
 
@@ -47,8 +47,6 @@ new Thread(() =>
                 .WithResult(Okay())
                 .Build()
         );
-
-        Console.WriteLine("/api/v1/ping: " + response);
 
         Thread.Sleep(TimeSpan.FromSeconds(5));
     }

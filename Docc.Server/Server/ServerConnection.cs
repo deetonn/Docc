@@ -21,8 +21,8 @@ internal enum ServerType
 
 internal class ServerConnection
 {
-    public readonly ILogger Logger;
-    private IAuthorizationService _authService;
+    public ILogger? Logger;
+    private IAuthorizationService? _authService;
 
     // TODO:
     // when a user connects, make them supply a username + password.
@@ -42,10 +42,13 @@ internal class ServerConnection
     {
         _authService = new T();
     }
-    public void InitStorage(string path)
+    public void UseLogger<T>() where T : ILogger, new()
     {
-        _storage = new StorageContainer(path);
+        Logger = new T();
     }
+
+    public void UseDefaultStorage(string path)
+        => _storage = new StorageContainer(path);
 
     public string Version { get; }
     public string AppName { get; }
@@ -67,7 +70,7 @@ internal class ServerConnection
 
     public ServerConnection(ServerType connType)
     {
-        InitStorage("saved.json");
+        UseDefaultStorage("saved.json");
 
         Logger = new ServerConsoleLogger();
         _authService = new PrivateServerAuthorization();
@@ -84,7 +87,7 @@ internal class ServerConnection
          * but also matches ServerClients to sessionIds.
          */
 
-        Logger.Log($"starting server. ({AppName})");
+        Logger?.Log($"starting server. ({AppName})");
 
         if (connType != ServerType.Local)
         {
@@ -184,7 +187,7 @@ internal class ServerConnection
                 // We want to send the client their sessionId.
                 // So that any future requests can verify them that way.
 
-                Logger.Log($"accepted client `{connection?.Client?.Name}`");
+                Logger?.Log($"accepted client `{connection?.Client?.Name}`");
 
                 Context.Connections.Add(connection!);
 
@@ -200,8 +203,8 @@ internal class ServerConnection
         {
             while (Running)
             {
-                SpinWait.SpinUntil(() => Context.Connections.Any(x => x.Socket.Available > 0));
-                var clientsWhoSentMessages = Context.Connections.Where(x => x.Socket.Available > 0);
+                SpinWait.SpinUntil(() => Context.Connections.Any(x => x.Socket?.Available > 0));
+                var clientsWhoSentMessages = Context.Connections.Where(x => x.Socket?.Available > 0);
 
                 List<(Request, Connection)> sentMessages = new();
 

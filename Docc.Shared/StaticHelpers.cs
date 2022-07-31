@@ -33,6 +33,15 @@ public static class StaticHelpers
     {
         return real.Count() == expected;
     }
+
+    public static void RunIn(int secs, Action act)
+    {
+        Task.Run(async () =>
+        {
+            await Task.Delay(secs * 1000);
+            act.Invoke();
+        });
+    }
 }
 
 public static class SocketExtensions
