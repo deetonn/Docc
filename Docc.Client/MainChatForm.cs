@@ -16,6 +16,8 @@ namespace Docc.Client;
 
 public partial class MainChatForm : Form
 {
+    private LogsForm logsForm;
+
     public MainChatForm()
     {
         InitializeComponent();
@@ -29,14 +31,10 @@ public partial class MainChatForm : Form
         if (Global.Client is null)
             return;
 
+        // Just handle it, many endpoints that return nothing send this.
+
         Global.AddCallback("/", (req) =>
         {
-            var msg = "No message in request.";
-
-            if (req.Content.Any())
-                msg = req.Content.First();
-
-            ShowMsg($"received unknown request. Message: {msg}");
         });
         Global.AddCallback("/error/handle", (req) =>
         {
@@ -91,6 +89,7 @@ public partial class MainChatForm : Form
 
         Task.Run(async () =>
         {
+            Global.Log($"mainForm: {message}");
             await Task.Delay(5000);
             ErrorBox.Text = string.Empty;
         });
@@ -219,5 +218,11 @@ public partial class MainChatForm : Form
     private void MainChatForm_MouseUp(object? sender, MouseEventArgs e)
     {
         dragging = false;
+    }
+
+    private void ViewLogsButton_Click(object sender, EventArgs e)
+    {
+        logsForm = new LogsForm();
+        logsForm.Show();
     }
 }

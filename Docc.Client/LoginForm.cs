@@ -7,6 +7,8 @@ namespace Docc.Client
 {
     public partial class LoginForm : Form
     {
+
+
         public LoginForm()
         {
             InitializeComponent();
@@ -124,6 +126,7 @@ namespace Docc.Client
 
             Task.Run(async () =>
             {
+                Global.Log($"loginForm: {message}");
                 await Task.Delay(5000);
                 StatusTextBox.Text = string.Empty;
             });

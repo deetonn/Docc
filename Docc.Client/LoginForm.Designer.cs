@@ -43,7 +43,7 @@
             // 
             this.QuickButton.BackColor = System.Drawing.Color.Gray;
             this.QuickButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.QuickButton.Location = new System.Drawing.Point(759, -3);
+            this.QuickButton.Location = new System.Drawing.Point(308, -3);
             this.QuickButton.Name = "QuickButton";
             this.QuickButton.Size = new System.Drawing.Size(43, 23);
             this.QuickButton.TabIndex = 0;
@@ -56,7 +56,7 @@
             this.LoginLabel.AutoSize = true;
             this.LoginLabel.Font = new System.Drawing.Font("Fira Code", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.LoginLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.LoginLabel.Location = new System.Drawing.Point(232, 59);
+            this.LoginLabel.Location = new System.Drawing.Point(27, 43);
             this.LoginLabel.Name = "LoginLabel";
             this.LoginLabel.Size = new System.Drawing.Size(297, 40);
             this.LoginLabel.TabIndex = 1;
@@ -65,7 +65,7 @@
             // UserTextBox
             // 
             this.UserTextBox.Font = new System.Drawing.Font("Fira Code", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.UserTextBox.Location = new System.Drawing.Point(232, 149);
+            this.UserTextBox.Location = new System.Drawing.Point(27, 100);
             this.UserTextBox.Name = "UserTextBox";
             this.UserTextBox.Size = new System.Drawing.Size(297, 27);
             this.UserTextBox.TabIndex = 2;
@@ -75,7 +75,7 @@
             // PasswordTextBox
             // 
             this.PasswordTextBox.Font = new System.Drawing.Font("Fira Code", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.PasswordTextBox.Location = new System.Drawing.Point(232, 231);
+            this.PasswordTextBox.Location = new System.Drawing.Point(27, 166);
             this.PasswordTextBox.Name = "PasswordTextBox";
             this.PasswordTextBox.PasswordChar = '*';
             this.PasswordTextBox.Size = new System.Drawing.Size(297, 27);
@@ -86,7 +86,7 @@
             // 
             this.PasswordLabel.AutoSize = true;
             this.PasswordLabel.Font = new System.Drawing.Font("Fira Code", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.PasswordLabel.Location = new System.Drawing.Point(334, 208);
+            this.PasswordLabel.Location = new System.Drawing.Point(131, 143);
             this.PasswordLabel.Name = "PasswordLabel";
             this.PasswordLabel.Size = new System.Drawing.Size(89, 20);
             this.PasswordLabel.TabIndex = 4;
@@ -97,7 +97,7 @@
             this.LoginButton.BackColor = System.Drawing.Color.White;
             this.LoginButton.Font = new System.Drawing.Font("Fira Code", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.LoginButton.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.LoginButton.Location = new System.Drawing.Point(278, 273);
+            this.LoginButton.Location = new System.Drawing.Point(131, 199);
             this.LoginButton.Name = "LoginButton";
             this.LoginButton.Size = new System.Drawing.Size(89, 31);
             this.LoginButton.TabIndex = 5;
@@ -110,11 +110,11 @@
             this.StatusTextBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
             this.StatusTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.StatusTextBox.Font = new System.Drawing.Font("Fira Code", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.StatusTextBox.Location = new System.Drawing.Point(192, 342);
+            this.StatusTextBox.Location = new System.Drawing.Point(27, 265);
             this.StatusTextBox.Multiline = true;
             this.StatusTextBox.Name = "StatusTextBox";
             this.StatusTextBox.ReadOnly = true;
-            this.StatusTextBox.Size = new System.Drawing.Size(393, 96);
+            this.StatusTextBox.Size = new System.Drawing.Size(306, 158);
             this.StatusTextBox.TabIndex = 6;
             this.StatusTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.StatusTextBox.TextChanged += new System.EventHandler(this.StatusTextBox_TextChanged);
@@ -123,9 +123,9 @@
             // 
             this.MinimizeButton.BackColor = System.Drawing.Color.Gray;
             this.MinimizeButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.MinimizeButton.Location = new System.Drawing.Point(723, -3);
+            this.MinimizeButton.Location = new System.Drawing.Point(281, -3);
             this.MinimizeButton.Name = "MinimizeButton";
-            this.MinimizeButton.Size = new System.Drawing.Size(39, 23);
+            this.MinimizeButton.Size = new System.Drawing.Size(33, 23);
             this.MinimizeButton.TabIndex = 7;
             this.MinimizeButton.Text = "⎯";
             this.MinimizeButton.UseVisualStyleBackColor = false;
@@ -135,7 +135,7 @@
             // 
             this.RememberMe.AutoSize = true;
             this.RememberMe.Font = new System.Drawing.Font("Fira Code", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.RememberMe.Location = new System.Drawing.Point(384, 281);
+            this.RememberMe.Location = new System.Drawing.Point(114, 236);
             this.RememberMe.Name = "RememberMe";
             this.RememberMe.Size = new System.Drawing.Size(127, 23);
             this.RememberMe.TabIndex = 8;
@@ -147,7 +147,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(344, 450);
             this.Controls.Add(this.RememberMe);
             this.Controls.Add(this.MinimizeButton);
             this.Controls.Add(this.StatusTextBox);

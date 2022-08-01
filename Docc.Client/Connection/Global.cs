@@ -17,6 +17,14 @@ public class LocalLoginCredentials
 
 public static class Global
 {
+    private const string logFile = "docc-logs.txt";
+
+    static Global()
+    {
+        if (File.Exists(logFile))
+            File.Delete(logFile);
+    }
+
     public static Client? Client { get; set; }
     public static Dictionary<string, Action<Request>> Handlers = new();
 
@@ -75,5 +83,24 @@ public static class Global
     public static void AddCallback(string loc, Action<Request> req)
     {
         Handlers.Add(loc, req);
+    }
+
+
+    public static void Log(string message)
+    {
+        if (!File.Exists(logFile))
+        {
+            File.Create(logFile).Close();
+        }
+
+        File.AppendAllText(logFile, message);
+    }
+
+    public static string[] LoadLogFileText()
+    {
+        if (!File.Exists(logFile))
+            return new[] { "no logs yet." };
+
+        return File.ReadAllLines(logFile);
     }
 }

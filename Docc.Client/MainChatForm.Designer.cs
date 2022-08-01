@@ -41,6 +41,7 @@
             this.ErrorBox = new System.Windows.Forms.TextBox();
             this.button2 = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
+            this.ViewLogsButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // SessionIdLabel
@@ -113,7 +114,7 @@
             // CustomColorEnabled
             // 
             this.CustomColorEnabled.AutoSize = true;
-            this.CustomColorEnabled.Location = new System.Drawing.Point(636, 115);
+            this.CustomColorEnabled.Location = new System.Drawing.Point(500, 61);
             this.CustomColorEnabled.Name = "CustomColorEnabled";
             this.CustomColorEnabled.Size = new System.Drawing.Size(100, 19);
             this.CustomColorEnabled.TabIndex = 6;
@@ -122,10 +123,10 @@
             // 
             // CustomColorTextBox
             // 
-            this.CustomColorTextBox.Location = new System.Drawing.Point(636, 140);
+            this.CustomColorTextBox.Location = new System.Drawing.Point(500, 86);
             this.CustomColorTextBox.MaxLength = 16;
             this.CustomColorTextBox.Name = "CustomColorTextBox";
-            this.CustomColorTextBox.Size = new System.Drawing.Size(152, 23);
+            this.CustomColorTextBox.Size = new System.Drawing.Size(130, 23);
             this.CustomColorTextBox.TabIndex = 7;
             // 
             // ErrorBox
@@ -134,11 +135,11 @@
             this.ErrorBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.ErrorBox.Enabled = false;
             this.ErrorBox.Font = new System.Drawing.Font("Fira Code", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.ErrorBox.Location = new System.Drawing.Point(541, 215);
+            this.ErrorBox.Location = new System.Drawing.Point(570, 341);
             this.ErrorBox.Multiline = true;
             this.ErrorBox.Name = "ErrorBox";
             this.ErrorBox.ReadOnly = true;
-            this.ErrorBox.Size = new System.Drawing.Size(226, 209);
+            this.ErrorBox.Size = new System.Drawing.Size(218, 83);
             this.ErrorBox.TabIndex = 8;
             this.ErrorBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
@@ -166,12 +167,23 @@
             this.button3.UseVisualStyleBackColor = false;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
+            // ViewLogsButton
+            // 
+            this.ViewLogsButton.Location = new System.Drawing.Point(-1, 430);
+            this.ViewLogsButton.Name = "ViewLogsButton";
+            this.ViewLogsButton.Size = new System.Drawing.Size(75, 23);
+            this.ViewLogsButton.TabIndex = 11;
+            this.ViewLogsButton.Text = "View Logs";
+            this.ViewLogsButton.UseVisualStyleBackColor = true;
+            this.ViewLogsButton.Click += new System.EventHandler(this.ViewLogsButton_Click);
+            // 
             // MainChatForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.ViewLogsButton);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.ErrorBox);
@@ -206,5 +218,6 @@
         private TextBox ErrorBox;
         private Button button2;
         private Button button3;
+        private Button ViewLogsButton;
     }
 }
