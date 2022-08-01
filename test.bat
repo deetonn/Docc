@@ -5,7 +5,7 @@ timeout 5
 
 cd ../../../../
 
-cd DoccSharp/bin/Debug/net6.0
-start Docc.exe
+cd Docc.Client/bin/Debug/net6.0-windows
+start Docc.Client.exe
 
 cd ../../../../
