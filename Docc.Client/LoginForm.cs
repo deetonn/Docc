@@ -1,6 +1,7 @@
 using Docc.Client.Connection;
 using Docc.Common;
 using Docc.Common.Storage;
+using System.Drawing.Text;
 
 namespace Docc.Client
 {
@@ -13,6 +14,17 @@ namespace Docc.Client
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            // Quick little check to see if 'Fira Code' is installed, if not tell the
+            // person that it's the intended font.
+
+            var fontsCollection = new InstalledFontCollection();
+
+            if (!fontsCollection.Families.Any(x => x.Name == "Fira Code"))
+            {
+                MessageBox.Show("You've not installed 'Fira Code', which is the intended font.", "Warning", MessageBoxButtons.OK);
+            }
+
+
             var (saveLoginResult, message) = Global.TryLoginFromSaveFile("credentials.key");
 
             if (!saveLoginResult)
