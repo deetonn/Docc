@@ -132,10 +132,12 @@
             // 
             this.ErrorBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
             this.ErrorBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.ErrorBox.Enabled = false;
             this.ErrorBox.Font = new System.Drawing.Font("Fira Code", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.ErrorBox.Location = new System.Drawing.Point(541, 215);
             this.ErrorBox.Multiline = true;
             this.ErrorBox.Name = "ErrorBox";
+            this.ErrorBox.ReadOnly = true;
             this.ErrorBox.Size = new System.Drawing.Size(226, 209);
             this.ErrorBox.TabIndex = 8;
             this.ErrorBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;

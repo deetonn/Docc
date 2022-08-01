@@ -28,39 +28,39 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.button1 = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
+            this.QuickButton = new System.Windows.Forms.Button();
+            this.LoginLabel = new System.Windows.Forms.Label();
             this.UserTextBox = new System.Windows.Forms.TextBox();
             this.PasswordTextBox = new System.Windows.Forms.TextBox();
             this.PasswordLabel = new System.Windows.Forms.Label();
-            this.button2 = new System.Windows.Forms.Button();
+            this.LoginButton = new System.Windows.Forms.Button();
             this.StatusTextBox = new System.Windows.Forms.TextBox();
-            this.button3 = new System.Windows.Forms.Button();
+            this.MinimizeButton = new System.Windows.Forms.Button();
             this.RememberMe = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
-            // button1
+            // QuickButton
             // 
-            this.button1.BackColor = System.Drawing.Color.Gray;
-            this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button1.Location = new System.Drawing.Point(759, -3);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(43, 23);
-            this.button1.TabIndex = 0;
-            this.button1.Text = "X";
-            this.button1.UseVisualStyleBackColor = false;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.QuickButton.BackColor = System.Drawing.Color.Gray;
+            this.QuickButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.QuickButton.Location = new System.Drawing.Point(759, -3);
+            this.QuickButton.Name = "QuickButton";
+            this.QuickButton.Size = new System.Drawing.Size(43, 23);
+            this.QuickButton.TabIndex = 0;
+            this.QuickButton.Text = "X";
+            this.QuickButton.UseVisualStyleBackColor = false;
+            this.QuickButton.Click += new System.EventHandler(this.QuitButton_Click);
             // 
-            // label1
+            // LoginLabel
             // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Fira Code", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.label1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.label1.Location = new System.Drawing.Point(232, 59);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(297, 40);
-            this.label1.TabIndex = 1;
-            this.label1.Text = "Docc <= Client";
+            this.LoginLabel.AutoSize = true;
+            this.LoginLabel.Font = new System.Drawing.Font("Fira Code", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.LoginLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.LoginLabel.Location = new System.Drawing.Point(232, 59);
+            this.LoginLabel.Name = "LoginLabel";
+            this.LoginLabel.Size = new System.Drawing.Size(297, 40);
+            this.LoginLabel.TabIndex = 1;
+            this.LoginLabel.Text = "Docc <= Client";
             // 
             // UserTextBox
             // 
@@ -92,18 +92,18 @@
             this.PasswordLabel.TabIndex = 4;
             this.PasswordLabel.Text = "Password";
             // 
-            // button2
+            // LoginButton
             // 
-            this.button2.BackColor = System.Drawing.Color.White;
-            this.button2.Font = new System.Drawing.Font("Fira Code", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.button2.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.button2.Location = new System.Drawing.Point(278, 273);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(89, 31);
-            this.button2.TabIndex = 5;
-            this.button2.Text = "Login";
-            this.button2.UseVisualStyleBackColor = false;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
+            this.LoginButton.BackColor = System.Drawing.Color.White;
+            this.LoginButton.Font = new System.Drawing.Font("Fira Code", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.LoginButton.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.LoginButton.Location = new System.Drawing.Point(278, 273);
+            this.LoginButton.Name = "LoginButton";
+            this.LoginButton.Size = new System.Drawing.Size(89, 31);
+            this.LoginButton.TabIndex = 5;
+            this.LoginButton.Text = "Login";
+            this.LoginButton.UseVisualStyleBackColor = false;
+            this.LoginButton.Click += new System.EventHandler(this.LoginButton_Click);
             // 
             // StatusTextBox
             // 
@@ -113,21 +113,23 @@
             this.StatusTextBox.Location = new System.Drawing.Point(192, 342);
             this.StatusTextBox.Multiline = true;
             this.StatusTextBox.Name = "StatusTextBox";
+            this.StatusTextBox.ReadOnly = true;
             this.StatusTextBox.Size = new System.Drawing.Size(393, 96);
             this.StatusTextBox.TabIndex = 6;
             this.StatusTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.StatusTextBox.TextChanged += new System.EventHandler(this.StatusTextBox_TextChanged);
             // 
-            // button3
+            // MinimizeButton
             // 
-            this.button3.BackColor = System.Drawing.Color.Gray;
-            this.button3.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button3.Location = new System.Drawing.Point(723, -3);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(39, 23);
-            this.button3.TabIndex = 7;
-            this.button3.Text = "⎯";
-            this.button3.UseVisualStyleBackColor = false;
-            this.button3.Click += new System.EventHandler(this.button3_Click);
+            this.MinimizeButton.BackColor = System.Drawing.Color.Gray;
+            this.MinimizeButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.MinimizeButton.Location = new System.Drawing.Point(723, -3);
+            this.MinimizeButton.Name = "MinimizeButton";
+            this.MinimizeButton.Size = new System.Drawing.Size(39, 23);
+            this.MinimizeButton.TabIndex = 7;
+            this.MinimizeButton.Text = "⎯";
+            this.MinimizeButton.UseVisualStyleBackColor = false;
+            this.MinimizeButton.Click += new System.EventHandler(this.MinimizeButton_Click);
             // 
             // RememberMe
             // 
@@ -147,14 +149,14 @@
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.RememberMe);
-            this.Controls.Add(this.button3);
+            this.Controls.Add(this.MinimizeButton);
             this.Controls.Add(this.StatusTextBox);
-            this.Controls.Add(this.button2);
+            this.Controls.Add(this.LoginButton);
             this.Controls.Add(this.PasswordLabel);
             this.Controls.Add(this.PasswordTextBox);
             this.Controls.Add(this.UserTextBox);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.LoginLabel);
+            this.Controls.Add(this.QuickButton);
             this.ForeColor = System.Drawing.SystemColors.ControlText;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "LoginForm";
@@ -168,14 +170,14 @@
 
         #endregion
 
-        private Button button1;
-        private Label label1;
+        private Button QuickButton;
+        private Label LoginLabel;
         private TextBox UserTextBox;
         private TextBox PasswordTextBox;
         private Label PasswordLabel;
-        private Button button2;
+        private Button LoginButton;
         private TextBox StatusTextBox;
-        private Button button3;
+        private Button MinimizeButton;
         private CheckBox RememberMe;
     }
 }

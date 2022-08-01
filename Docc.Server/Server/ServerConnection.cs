@@ -55,6 +55,7 @@ internal class ServerConnection
 
     protected Thread Listener { get; }
     protected Thread MessageAcceptor { get; }
+    protected Thread ConnectionValidator { get; }
     protected bool Running { get; } = true;
 
     public IPAddress Address { get; }
@@ -71,6 +72,7 @@ internal class ServerConnection
     public ServerConnection(ServerType connType)
     {
         UseDefaultStorage("saved.json");
+        UseLogger<ServerConsoleLogger>();
 
         Logger = new ServerConsoleLogger();
         _authService = new PrivateServerAuthorization();
@@ -98,6 +100,8 @@ internal class ServerConnection
 
         Listener = new(() =>
         {
+            Logger?.Log("connection listener has started");
+
             while (Running)
             {
                 // Socket
@@ -201,6 +205,8 @@ internal class ServerConnection
         });
         MessageAcceptor = new(() =>
         {
+            Logger?.Log("message acceptor has started");
+
             while (Running)
             {
                 SpinWait.SpinUntil(() => Context.Connections.Any(x => x.Socket?.Available > 0));
@@ -287,9 +293,43 @@ internal class ServerConnection
                 }
             }
         });
+        ConnectionValidator = new(() =>
+        {
+            Logger?.Log("connection validator started");
+
+            while (Running)
+            {
+                var originalSize = ContextView().Connections.Count;
+
+                SpinWait.SpinUntil(() => Context.Connections.Count != originalSize);
+
+                List<Connection> ToRemove = new List<Connection>();
+
+                foreach (var connection in Context.Connections)
+                {
+                    if (connection.Disconnected || connection.Socket is null || !connection.Socket.Connected)
+                    {
+                        ToRemove.Add(connection);
+                    }
+                }
+
+                if (!ToRemove.Any())
+                    continue;
+
+                foreach (var dead in ToRemove)
+                {
+                    // when they've disconnected it all gets cleaned up (Main.cs, disconnect endpoint),
+                    // so all there is to do is remove it from active connections.
+
+                    Logger?.Log($"`{dead.Client?.Name}` has disconnected");
+                    Context.Connections.Remove(dead);
+                }
+            }
+        });
 
         Listener.Start();
         MessageAcceptor.Start();
+        ConnectionValidator.Start();
     }
 
     // TODO:

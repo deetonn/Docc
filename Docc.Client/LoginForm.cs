@@ -6,20 +6,6 @@ namespace Docc.Client
 {
     public partial class LoginForm : Form
     {
-        private void ShowMsg(string message)
-        {
-            if (CheckForIllegalCrossThreadCalls)
-                CheckForIllegalCrossThreadCalls = false;
-
-            StatusTextBox.Text = message;
-
-            Task.Run(async () =>
-            {
-                await Task.Delay(5000);
-                StatusTextBox.Text = string.Empty;
-            });
-        }
-
         public LoginForm()
         {
             InitializeComponent();
@@ -45,22 +31,8 @@ namespace Docc.Client
             mainForm.Show();
         }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-            if (Global.Client?.Connection.Connected == true)
-            {
-                Global.Client?.MakeRequest(
-                    new RequestBuilder()
-                        .WithResult(RequestResult.OK)
-                        .WithLocation("/api/v1/disconnect")
-                        .Build()
-                );
-            }
-
-            Environment.Exit(0);
-        }
-
-        private void button2_Click(object sender, EventArgs e)
+        // 'Login' button.
+        private void LoginButton_Click(object sender, EventArgs e)
         {
             // attempt to login
 
@@ -109,9 +81,45 @@ namespace Docc.Client
             MainChatForm.Show();
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        // Top right 'X' button.
+        private void QuitButton_Click(object sender, EventArgs e)
+        {
+            if (Global.Client?.Connection.Connected == true)
+            {
+                Global.Client?.MakeRequest(
+                    new RequestBuilder()
+                        .WithResult(RequestResult.OK)
+                        .WithLocation("/api/v1/disconnect")
+                        .Build()
+                );
+            }
+
+            Environment.Exit(0);
+        }
+
+        // Top right '-' button.
+        private void MinimizeButton_Click(object sender, EventArgs e)
         {
             WindowState = FormWindowState.Minimized;
+        }
+
+        private void ShowMsg(string message)
+        {
+            if (CheckForIllegalCrossThreadCalls)
+                CheckForIllegalCrossThreadCalls = false;
+
+            StatusTextBox.Text = message;
+
+            Task.Run(async () =>
+            {
+                await Task.Delay(5000);
+                StatusTextBox.Text = string.Empty;
+            });
+        }
+
+        private void StatusTextBox_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
