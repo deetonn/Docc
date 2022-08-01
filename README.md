@@ -3,3 +3,7 @@ An example of client-server connections built from scratch. This project contain
 
 # Work in progress
 This is currently implemented to be used locally, it also does not encrypt packets being sent across sockets and it's mega scuffed. It will eventually be good though.
+
+# Contribution
+
+Feel free, anything to improve this madness would be nice.
