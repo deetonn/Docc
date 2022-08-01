@@ -11,6 +11,7 @@ Warning :warning: This is for Microsoft Visual Studio 2022. I'm not sure about a
  5. Run *test.bat* (or optionally *server.bat* and *client.bat*)
  6. Once the server has started, type **user.create [name] [password]**. This will save this login so a client can login using it.
  7. Login via the client.
+ 8. (Optional) If you want to see the font that is intended, install the font from [here](https://github.com/tonsky/FiraCode)
  
 Now you're ready to debug and tinker.
 
