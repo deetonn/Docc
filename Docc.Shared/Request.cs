@@ -74,6 +74,11 @@ public class Request
             .WithLocation("/")
             .WithResult(RequestResult.TimedOut)
             .Build();
+
+    public static Request Okay
+        => new RequestBuilder()
+            .WithResult(RequestResult.OK)
+            .Build();
 }
 
 // Just makes things look easier on the eyes when making a client/server.

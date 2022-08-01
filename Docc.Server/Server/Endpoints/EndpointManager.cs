@@ -28,6 +28,9 @@ internal class DirectoryListingManager
         ActiveListings.Add(new DirectoryListing(Location, callback));
     }
 
+    public void Map(string Location, ContentCallback callback)
+        => MapSet(Location, callback);
+
     /*
      * TODO:
      * 

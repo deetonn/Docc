@@ -9,8 +9,10 @@ using Docc.Server.Server;
 using Docc.Server.Server.Auth;
 using Docc.Common.Storage;
 using Docc.Server.Endpoints;
+using System.Drawing;
+using Pastel;
 
-Environment.SetEnvironmentVariable("App-Version", "v0.0.4-dev.1");
+Environment.SetEnvironmentVariable("App-Version", "v0.0.6-dev.1");
 Environment.SetEnvironmentVariable("App-Agent", $"Docc {Environment.GetEnvironmentVariable("App-Version")}");
 
 DirectoryListingManager manager = new();
@@ -58,6 +60,7 @@ AppDomain.CurrentDomain.ProcessExit += (sender, e) =>
 // and send it to the client.
 
 connection.UseAuthorization<PrivateServerAuthorization>();
+connection.UseLogger<ServerConsoleLogger>();
 
 Random serverRng = new();
 var version = Environment.GetEnvironmentVariable("App-Version")!;
@@ -90,6 +93,62 @@ manager.MapGet("/api/v1/disconnect", (args, conn) =>
     return new RequestBuilder()
         .WithResult(RequestResult.OK)
         .Build();
+});
+manager.MapGet("/chat/api/sendMessage", (args, conn) =>
+{
+    var error = new RequestBuilder()
+        .WithLocation("/error/handle")
+        .WithResult(RequestResult.BadArguments)
+        .AddContent("request is missing required argument.")
+        .Build();
+
+    var color = Color.White;
+    string name = conn.Client?.Name ?? "Retard";
+
+    if (args.ContainsKey("name"))
+        name = args["name"];
+    if (!args.ContainsKey("msg"))
+        return error;
+    if (args.ContainsKey("col"))
+    {
+        try
+        {
+            color = Color.FromName(args["col"]);
+        }
+        catch (Exception)
+        {
+            // doesnt matter, color will be white.
+        }
+    }
+
+    var message = args["msg"];
+
+    // sanitise string...
+
+    Task.Run(() =>
+    {
+        var request = new RequestBuilder()
+            .WithLocation("/chat/api/receive")
+            .WithResult(RequestResult.OK)
+            .WithArguments(new()
+                            {
+                                { "name", name },
+                                { "color", color.Name },
+                                { "msg", message }
+                            });
+
+        foreach (var cl in connection.ContextView().Connections)
+        {
+            if (cl.Client?.Name == conn.Client?.Name)
+            {
+                continue;
+            }
+
+            cl?.Socket?.SendRequest(request.Build());
+        }
+    });
+
+    return Request.Okay;
 });
 
 /*
@@ -137,10 +196,9 @@ context.Add("invalidate", (args, logger) =>
 
 connection.OnMessage = (req, client) =>
 {
-    //connection.Logger.Log($"received request for '{req.Location}'");
+    connection.Logger?.Log($"received request for '{req.Location}'");
 
-    var response = manager.CallMappedLocal(req.Location, req.Arguments);
-    client.Socket?.SendRequest(response);
+    manager.CallMappedOnline(req.Location, req.Arguments, client);
 };
 
 context.Add("user.create", (args, logger) =>

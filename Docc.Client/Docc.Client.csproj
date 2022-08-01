@@ -6,7 +6,12 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
+    <StartupObject>Docc.Client.Program</StartupObject>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Pastel" Version="3.0.1" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Docc.Shared\Docc.Common.csproj" />

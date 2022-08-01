@@ -20,7 +20,9 @@ internal class ClientConnection
     public IPHostEntry Entry { get; } = Dns.GetHostEntry("localhost");
     public IPEndPoint ServerEndpoint { get; }
 
-    public ClientConnection(string userName, string password)
+    // raw flag specifies the password is already hashed (for saving it locally)
+
+    public ClientConnection(string userName, string password, bool raw = false)
     {
         _logger = new ClientConsoleLogger();
 
@@ -55,7 +57,7 @@ internal class ClientConnection
         _logger.Log($"resolved host [{ServerEndpoint.Address}:{ServerEndpoint.Port}, {ServerEndpoint.AddressFamily}]");
 
         var rb = new RequestBuilder()
-            .WithArguments(new() { { "userName", userName }, { "hashedPw", StorageUtil.Sha256Hash(password) } });
+            .WithArguments(new() { { "userName", userName }, { "hashedPw", raw ? password : StorageUtil.Sha256Hash(password) } });
 
         Socket.SendEncrypted(rb.Build(), _logger);
         var status = Socket.ReceiveEncrypted(_logger);

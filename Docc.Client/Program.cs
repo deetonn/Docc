@@ -1,3 +1,5 @@
+using Docc.Client.Connection;
+
 namespace Docc.Client
 {
     internal static class Program

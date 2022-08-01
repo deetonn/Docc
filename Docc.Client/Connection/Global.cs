@@ -1,21 +1,79 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Docc.Common;
+using Newtonsoft.Json;
+
+using System.Windows.Forms;
 
 namespace Docc.Client.Connection;
 
+[JsonObject]
+public class LocalLoginCredentials
+{
+    [JsonProperty(PropertyName = "local-user")]
+    public string Username { get; set; }
+
+    [JsonProperty(PropertyName = "creds")]
+    public string HashedPassword { get; set; }
+}
+
 public static class Global
 {
-    public static Client? Connection { get; set; }
+    public static Client? Client { get; set; }
+    public static Dictionary<string, Action<Request>> Handlers = new();
 
-    public static bool TryLogin(string user, string pass)
+    public static (bool, string) TryLogin(string user, string pass, bool raw = false)
     {
-        Client conn;
-        var res = DoccClient.Create(user, pass, out conn);
+        Client conn = null!;
+        bool res = false;
+        string msg = string.Empty;
 
-        Connection = conn;
-        return res;
+        try
+        {
+            (res, msg) = DoccClient.Create(user, pass, out conn, raw);
+        }
+        catch (ObjectDisposedException)
+        {
+            msg = "cannot cannot to the server.";
+        }
+
+        Client = conn;
+        return (res, msg);
+    }
+    public static (bool, string) TryLoginFromSaveFile(string saveFile)
+    {
+        if (!File.Exists(saveFile))
+        {
+            return (false, "save file not found.");
+        }
+
+        LocalLoginCredentials? creds;
+
+        try
+        {
+            var contents = File.ReadAllText(saveFile);
+            creds = JsonConvert.DeserializeObject<LocalLoginCredentials>(contents);
+        }
+        catch (JsonException e)
+        {
+            return (false, e.Message);
+        }
+
+        if (creds is LocalLoginCredentials login)
+        {
+            return TryLogin(login.Username, login.HashedPassword, true);
+        }
+
+        return (false, "failed to load saved login information");
+    }
+
+    public static void SaveLogin(LocalLoginCredentials creds, string saveFile)
+    {
+        var json = JsonConvert.SerializeObject(creds);
+        File.WriteAllText(saveFile, json);
+    }
+
+
+    public static void AddCallback(string loc, Action<Request> req)
+    {
+        Handlers.Add(loc, req);
     }
 }

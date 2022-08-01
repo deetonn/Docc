@@ -18,12 +18,17 @@ public class ClientConnection
 
     public bool Connected { get; private set; } = false;
     public string SessionId { get; private set; } = string.Empty;
+    public string LastMessage { get; private set; } = string.Empty;
+
+    private Thread MessageAccepter { get; set; }
 
     public IPAddress Address { get; }
     public IPHostEntry Entry { get; } = Dns.GetHostEntry("localhost");
     public IPEndPoint ServerEndpoint { get; }
 
-    public ClientConnection(string userName, string password)
+    // raw flag specifies the password is already hashed ( for saving locally )
+
+    public ClientConnection(string userName, string password, bool raw = false)
     {
         _logger = new ClientConsoleLogger();
 
@@ -57,7 +62,7 @@ public class ClientConnection
         _logger.Log($"resolved host [{ServerEndpoint.Address}:{ServerEndpoint.Port}, {ServerEndpoint.AddressFamily}]");
 
         var rb = new RequestBuilder()
-            .WithArguments(new() { { "userName", userName }, { "hashedPw", StorageUtil.Sha256Hash(password) } });
+            .WithArguments(new() { { "userName", userName }, { "hashedPw", raw ? password : StorageUtil.Sha256Hash(password) } });
 
         Socket.SendEncrypted(rb.Build(), _logger);
         var status = Socket.ReceiveEncrypted(_logger);
@@ -73,12 +78,36 @@ public class ClientConnection
         if (status.Result != RequestResult.OK)
         {
             _logger.Log($"server rejected the connection with reason: {Translation.From(status.Result).Conversion}");
+            Connected = false;
+
+            if (status.Content.Any())
+                LastMessage = status.Content.First();
+
+            return;
         }
 
         _logger.Log("connected to server!");
         Connected = true;
         SessionId = status.Arguments["session_id"];
+
+        MessageAccepter = new(() =>
+        {
+            while (Connected)
+            {
+                SpinWait.SpinUntil(() => Socket.Available > 0);
+                var content = Socket.ReceiveEncrypted(_logger);
+
+                if (content is null)
+                    continue;
+
+                OnRequest(content);
+            }
+        });
+        MessageAccepter.Start();
     }
+
+    public Action<Request> OnRequest { get; set; }
+        = delegate (Request req) { };
 
     public Request? MakeRequest(Request query)
     {
@@ -88,5 +117,10 @@ public class ClientConnection
         var res = Socket.ReceiveEncrypted();
         _logger.Log($"received response '{res?.Location}' ({res?.Result})");
         return res;
+    }
+
+    public void MakeSpurnRequest(Request query)
+    {
+        Socket.SendEncrypted(query);
     }
 }

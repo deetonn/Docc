@@ -48,7 +48,17 @@ public static class SocketExtensions
 {
     public static Request? Receive(this Socket socket)
     {
-        SpinWait.SpinUntil(() => socket.Available != 0);
+        SpinWait.SpinUntil(() =>
+        {
+            if (socket is null)
+                return true;
+            return socket.Available != 0;
+        });
+
+        if (socket is null)
+        {
+            return Request.Default;
+        }
 
         byte[] buffer = new byte[1024];
         try
