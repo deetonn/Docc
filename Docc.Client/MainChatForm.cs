@@ -111,7 +111,7 @@ public partial class MainChatForm : Form
             return;
         }
 
-        SessionIdLabel.Text = Global.Client.Connection.SessionId;
+        SessionIdLabel.Text = $"SessionID: {Global.Client.Connection.SessionId}";
 
         WindowState = FormWindowState.Minimized;
         Show();

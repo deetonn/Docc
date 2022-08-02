@@ -57,18 +57,18 @@
             // 
             // ChatBox
             // 
+            this.ChatBox.AllowDrop = true;
             this.ChatBox.AutoArrange = false;
             this.ChatBox.BackColor = System.Drawing.SystemColors.InactiveCaption;
-            this.ChatBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.ChatBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.ChatBox.Cursor = System.Windows.Forms.Cursors.No;
             this.ChatBox.Font = new System.Drawing.Font("Fira Code", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.ChatBox.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.ChatBox.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
             listViewItem1});
-            this.ChatBox.LabelWrap = false;
             this.ChatBox.Location = new System.Drawing.Point(12, 30);
             this.ChatBox.Name = "ChatBox";
-            this.ChatBox.Size = new System.Drawing.Size(482, 353);
+            this.ChatBox.Size = new System.Drawing.Size(639, 353);
             this.ChatBox.TabIndex = 1;
             this.ChatBox.UseCompatibleStateImageBehavior = false;
             this.ChatBox.View = System.Windows.Forms.View.List;
@@ -78,13 +78,13 @@
             this.InputTextBox.Location = new System.Drawing.Point(12, 390);
             this.InputTextBox.Multiline = true;
             this.InputTextBox.Name = "InputTextBox";
-            this.InputTextBox.Size = new System.Drawing.Size(417, 34);
+            this.InputTextBox.Size = new System.Drawing.Size(574, 34);
             this.InputTextBox.TabIndex = 2;
             // 
             // button1
             // 
             this.button1.Font = new System.Drawing.Font("Fira Code", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.button1.Location = new System.Drawing.Point(435, 389);
+            this.button1.Location = new System.Drawing.Point(592, 390);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(59, 35);
             this.button1.TabIndex = 3;
@@ -95,7 +95,7 @@
             // CustomNameEnabled
             // 
             this.CustomNameEnabled.AutoSize = true;
-            this.CustomNameEnabled.Location = new System.Drawing.Point(636, 61);
+            this.CustomNameEnabled.Location = new System.Drawing.Point(658, 123);
             this.CustomNameEnabled.Name = "CustomNameEnabled";
             this.CustomNameEnabled.Size = new System.Drawing.Size(121, 19);
             this.CustomNameEnabled.TabIndex = 4;
@@ -105,16 +105,16 @@
             // CustomNameTextBox
             // 
             this.CustomNameTextBox.Font = new System.Drawing.Font("Fira Code", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.CustomNameTextBox.Location = new System.Drawing.Point(636, 86);
+            this.CustomNameTextBox.Location = new System.Drawing.Point(658, 148);
             this.CustomNameTextBox.MaxLength = 16;
             this.CustomNameTextBox.Name = "CustomNameTextBox";
-            this.CustomNameTextBox.Size = new System.Drawing.Size(152, 23);
+            this.CustomNameTextBox.Size = new System.Drawing.Size(130, 23);
             this.CustomNameTextBox.TabIndex = 5;
             // 
             // CustomColorEnabled
             // 
             this.CustomColorEnabled.AutoSize = true;
-            this.CustomColorEnabled.Location = new System.Drawing.Point(500, 61);
+            this.CustomColorEnabled.Location = new System.Drawing.Point(657, 177);
             this.CustomColorEnabled.Name = "CustomColorEnabled";
             this.CustomColorEnabled.Size = new System.Drawing.Size(100, 19);
             this.CustomColorEnabled.TabIndex = 6;
@@ -123,7 +123,7 @@
             // 
             // CustomColorTextBox
             // 
-            this.CustomColorTextBox.Location = new System.Drawing.Point(500, 86);
+            this.CustomColorTextBox.Location = new System.Drawing.Point(658, 202);
             this.CustomColorTextBox.MaxLength = 16;
             this.CustomColorTextBox.Name = "CustomColorTextBox";
             this.CustomColorTextBox.Size = new System.Drawing.Size(130, 23);
@@ -135,11 +135,11 @@
             this.ErrorBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.ErrorBox.Enabled = false;
             this.ErrorBox.Font = new System.Drawing.Font("Fira Code", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.ErrorBox.Location = new System.Drawing.Point(570, 341);
+            this.ErrorBox.Location = new System.Drawing.Point(657, 231);
             this.ErrorBox.Multiline = true;
             this.ErrorBox.Name = "ErrorBox";
             this.ErrorBox.ReadOnly = true;
-            this.ErrorBox.Size = new System.Drawing.Size(218, 83);
+            this.ErrorBox.Size = new System.Drawing.Size(131, 193);
             this.ErrorBox.TabIndex = 8;
             this.ErrorBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
@@ -169,12 +169,15 @@
             // 
             // ViewLogsButton
             // 
+            this.ViewLogsButton.BackColor = System.Drawing.SystemColors.InactiveCaption;
+            this.ViewLogsButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.ViewLogsButton.Font = new System.Drawing.Font("Fira Code", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.ViewLogsButton.Location = new System.Drawing.Point(-1, 430);
             this.ViewLogsButton.Name = "ViewLogsButton";
-            this.ViewLogsButton.Size = new System.Drawing.Size(75, 23);
+            this.ViewLogsButton.Size = new System.Drawing.Size(111, 23);
             this.ViewLogsButton.TabIndex = 11;
             this.ViewLogsButton.Text = "View Logs";
-            this.ViewLogsButton.UseVisualStyleBackColor = true;
+            this.ViewLogsButton.UseVisualStyleBackColor = false;
             this.ViewLogsButton.Click += new System.EventHandler(this.ViewLogsButton_Click);
             // 
             // MainChatForm
