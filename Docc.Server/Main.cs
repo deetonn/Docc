@@ -96,6 +96,22 @@ manager.MapGet("/api/v1/disconnect", (args, conn) =>
 });
 manager.MapGet("/chat/api/sendMessage", (args, conn) =>
 {
+    if (!conn.Client.Permissions.Contains("send_message"))
+    {
+        var rejectionMessage = new RequestBuilder()
+            .WithLocation("/chat/api/receive")
+            .WithResult(RequestResult.OK)
+            .WithArguments(new()
+            {
+                    { "name", "SERVER" },
+                    { "color", "DarkRed" },
+                    { "msg", "You do not have permission to speak right now." }
+            });
+
+        conn.Socket?.SendRequest(rejectionMessage.Build());
+        return new RequestBuilder().WithResult(RequestResult.NotAuthorized).Build();
+    }
+
     var error = new RequestBuilder()
         .WithLocation("/error/handle")
         .WithResult(RequestResult.BadArguments)
@@ -121,6 +137,19 @@ manager.MapGet("/chat/api/sendMessage", (args, conn) =>
         }
     }
 
+    if (conn.Client?.Tags.Any() is true)
+    {
+        var beforeTags = name;
+        name = string.Empty;
+
+        foreach (var tag in conn.Client?.Tags ?? Array.Empty<string>().ToList())
+        {
+            name += $"[{tag}]";
+        }
+
+        name += $" {beforeTags}";
+    }
+
     var message = args["msg"];
 
     // sanitise string...
@@ -143,6 +172,9 @@ manager.MapGet("/chat/api/sendMessage", (args, conn) =>
             {
                 continue;
             }
+
+            // all accounts will contain this permission unless it's been
+            // explicitly taken from them.
 
             cl?.Socket?.SendRequest(request.Build());
         }
@@ -193,6 +225,38 @@ context.Add("invalidate", (args, logger) =>
 
     user?.SessionKey.Invalidate();
 });
+context.Add("mute", (args, logger) =>
+{
+    if (!(args.Length == 1))
+    {
+        logger.Log("usage: mute <userid>");
+        return;
+    }
+
+    if (!connection.ContextView().TryGetUserById(args[0], out var user))
+    {
+        logger.Log("user does not exist in this context.");
+        return;
+    }
+
+    user?.Client?.Permissions.Remove("send_message");
+});
+context.Add("unmute", (args, logger) =>
+{
+    if (!(args.Length == 1))
+    {
+        logger.Log("usage: unmute <userid>");
+        return;
+    }
+
+    if (!connection.ContextView().TryGetUserById(args[0], out var user))
+    {
+        logger.Log("user does not exist in this context.");
+        return;
+    }
+
+    user?.Client?.Permissions.Add("send_message");
+});
 
 connection.OnMessage = (req, client) =>
 {
@@ -234,7 +298,7 @@ while (true)
     var command = shattered[0];
     List<string> arguments = new();
 
-    if (shattered.Length > 0)
+    if (shattered.Length > 1)
         arguments = shattered[1..].ToList();
 
     context.Execute(command, arguments.ToArray());
