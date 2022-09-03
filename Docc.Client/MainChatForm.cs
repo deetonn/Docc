@@ -38,12 +38,18 @@ public partial class MainChatForm : Form
         });
         Global.AddCallback("/error/handle", (req) =>
         {
-            var msg = "No error information";
+            if (!req.Arguments.ContainsKey("name"))
+                return;
+            if (!req.Arguments.ContainsKey("msg"))
+                return;
+            if (!req.Arguments.ContainsKey("color"))
+                return;
 
-            if (req.Content.Any())
-                msg = req.Content.First();
+            var color = Color.FromName(req.Arguments["color"]);
+            var msg = req.Arguments["msg"];
+            var name = "[!] " + req.Arguments["name"];
 
-            ShowMsg($"Error: {msg}");
+            InsertChatMessageLocal(msg, color, name);
         });
         Global.AddCallback("/chat/api/receive", (req) =>
         {
@@ -63,6 +69,8 @@ public partial class MainChatForm : Form
 
         Global.Client.Connection.OnRequest = (req) =>
         {
+            Global.Log($"received request to '{req.Location}. Body: {req}'");
+
             if (Global.Handlers.ContainsKey(req.Location))
             {
                 Global.Handlers[req.Location].Invoke(req);
@@ -75,8 +83,10 @@ public partial class MainChatForm : Form
 
     public void InsertChatMessageLocal(string message, Color color, string name)
     {
-        ListViewItem item = new ListViewItem($"{name}: {message}");
-        item.ForeColor = color;
+        ListViewItem item = new($"{name}: {message}")
+        {
+            ForeColor = color
+        };
         ChatBox.Items.Add(item);
     }
 

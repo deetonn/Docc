@@ -56,9 +56,6 @@ AppDomain.CurrentDomain.ProcessExit += (sender, e) =>
 //       anywhere in particular.
 //       It's simply a response, with a focus on the content.
 
-// will generate a random number based on our spec
-// and send it to the client.
-
 connection.UseAuthorization<PrivateServerAuthorization>();
 connection.UseLogger<ServerConsoleLogger>();
 
@@ -98,8 +95,10 @@ manager.MapGet("/chat/api/sendMessage", (args, conn) =>
 {
     if (!conn.Client.Permissions.Contains("send_message"))
     {
+        connection.Logger?.Log($"rejected message from `{conn?.Client?.Name}`, they are muted.");
+
         var rejectionMessage = new RequestBuilder()
-            .WithLocation("/chat/api/receive")
+            .WithLocation("/error/handle")
             .WithResult(RequestResult.OK)
             .WithArguments(new()
             {
@@ -108,7 +107,7 @@ manager.MapGet("/chat/api/sendMessage", (args, conn) =>
                     { "msg", "You do not have permission to speak right now." }
             });
 
-        conn.Socket?.SendRequest(rejectionMessage.Build());
+        conn?.Socket?.SendRequest(rejectionMessage.Build());
         return new RequestBuilder().WithResult(RequestResult.NotAuthorized).Build();
     }
 
@@ -239,7 +238,11 @@ context.Add("mute", (args, logger) =>
         return;
     }
 
-    user?.Client?.Permissions.Remove("send_message");
+    connection.ContextView().EditUserById(user!.Client!.UserId.ToString(), (original) =>
+    {
+        original.Client.Permissions.Remove("send_message");
+        return original;
+    });
 });
 context.Add("unmute", (args, logger) =>
 {
@@ -255,7 +258,11 @@ context.Add("unmute", (args, logger) =>
         return;
     }
 
-    user?.Client?.Permissions.Add("send_message");
+    connection.ContextView().EditUserById(user!.Client!.UserId.ToString(), (original) =>
+    {
+        original.Client.Permissions.Add("send_message");
+        return original;
+    });
 });
 
 connection.OnMessage = (req, client) =>

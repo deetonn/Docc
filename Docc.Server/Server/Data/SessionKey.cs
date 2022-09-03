@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Docc.Server.Data;
+﻿namespace Docc.Server.Data;
 
 internal class SessionKey
 {
     // defines the default session length.
-    private const int SessionLengthInHours = 4;
+    private const uint SessionLengthInHours = 4u;
 
     public SessionKey(DateTime? expiration = null)
     {
@@ -26,6 +20,10 @@ internal class SessionKey
     public bool IsValid
         => ExpiresAt > DateTime.Now;
 
+    /// <summary>
+    /// Invalidate the current instance. Who ever has been assigned this key will have to
+    /// log back in.
+    /// </summary>
     public void Invalidate()
     {
         ExpiresAt = DateTime.Now;

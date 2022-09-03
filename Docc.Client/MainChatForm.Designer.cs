@@ -75,6 +75,7 @@
             // 
             // InputTextBox
             // 
+            this.InputTextBox.Font = new System.Drawing.Font("Fira Code", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.InputTextBox.Location = new System.Drawing.Point(12, 390);
             this.InputTextBox.Multiline = true;
             this.InputTextBox.Name = "InputTextBox";
@@ -95,9 +96,10 @@
             // CustomNameEnabled
             // 
             this.CustomNameEnabled.AutoSize = true;
+            this.CustomNameEnabled.Font = new System.Drawing.Font("Fira Code", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.CustomNameEnabled.Location = new System.Drawing.Point(658, 123);
             this.CustomNameEnabled.Name = "CustomNameEnabled";
-            this.CustomNameEnabled.Size = new System.Drawing.Size(121, 19);
+            this.CustomNameEnabled.Size = new System.Drawing.Size(146, 20);
             this.CustomNameEnabled.TabIndex = 4;
             this.CustomNameEnabled.Text = "Use custom name";
             this.CustomNameEnabled.UseVisualStyleBackColor = true;
@@ -114,19 +116,21 @@
             // CustomColorEnabled
             // 
             this.CustomColorEnabled.AutoSize = true;
+            this.CustomColorEnabled.Font = new System.Drawing.Font("Fira Code", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.CustomColorEnabled.Location = new System.Drawing.Point(657, 177);
             this.CustomColorEnabled.Name = "CustomColorEnabled";
-            this.CustomColorEnabled.Size = new System.Drawing.Size(100, 19);
+            this.CustomColorEnabled.Size = new System.Drawing.Size(122, 20);
             this.CustomColorEnabled.TabIndex = 6;
             this.CustomColorEnabled.Text = "Custom Color";
             this.CustomColorEnabled.UseVisualStyleBackColor = true;
             // 
             // CustomColorTextBox
             // 
+            this.CustomColorTextBox.Font = new System.Drawing.Font("Fira Code", 8.999999F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.CustomColorTextBox.Location = new System.Drawing.Point(658, 202);
             this.CustomColorTextBox.MaxLength = 16;
             this.CustomColorTextBox.Name = "CustomColorTextBox";
-            this.CustomColorTextBox.Size = new System.Drawing.Size(130, 23);
+            this.CustomColorTextBox.Size = new System.Drawing.Size(130, 22);
             this.CustomColorTextBox.TabIndex = 7;
             // 
             // ErrorBox

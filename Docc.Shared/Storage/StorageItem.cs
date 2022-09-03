@@ -12,7 +12,7 @@ public interface ISafeItem
 {
     public string? Name { get; set; }
     public Guid UserId { get; set; }
-    public List<string> Permissions { get; set; }
+    public SortedSet<string> Permissions { get; set; }
     public List<string> Tags { get; set; }
 }
 
@@ -28,6 +28,6 @@ public class StorageItem : ISafeItem
     public virtual string? HashedPassword { get; set; }
     public virtual Guid UserId { get; set; } = Guid.NewGuid();
 
-    public virtual List<string> Permissions { get; set; } = new() { "send_message" };
+    public virtual SortedSet<string> Permissions { get; set; } = new() { "send_message" };
     public virtual List<string> Tags { get; set; } = new() { "User" };
 }

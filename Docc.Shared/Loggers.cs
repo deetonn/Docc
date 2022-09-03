@@ -1,4 +1,7 @@
-﻿namespace Docc.Common;
+﻿using Pastel;
+using System.Drawing;
+
+namespace Docc.Common;
 
 public interface ILogger
 {
@@ -16,7 +19,7 @@ public class ServerConsoleLogger : ILogger
 
     public void Log(string message)
     {
-        Console.WriteLine($"{DateTime.Now.ToLongTimeString()} {Target}{Tab}{message}");
+        Console.WriteLine($"{DateTime.Now.ToLongTimeString()} {Target.Pastel(Color.Green)}{Tab}{message}");
     }
 
     public void Log(string message, params object[] args)

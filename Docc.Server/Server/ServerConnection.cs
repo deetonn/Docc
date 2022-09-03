@@ -107,6 +107,10 @@ internal class ServerConnection
                 // Socket
                 var newConnection = Context.Socket.Accept();
 
+#if DEBUG
+                Console.WriteLine(ContextView().DebugView());
+#endif
+
                 // could block this thread..
                 var firstPacket = newConnection.ReceiveEncrypted();
 
@@ -209,8 +213,12 @@ internal class ServerConnection
 
             while (Running)
             {
-                SpinWait.SpinUntil(() => Context.Connections.Any(x => x.Socket?.Available > 0));
+                SpinWait.SpinUntil(() => Context.Connections.Any(x => (x.Socket?.Available) > 0));
                 var clientsWhoSentMessages = Context.Connections.Where(x => x.Socket?.Available > 0);
+
+#if DEBUG
+                Console.WriteLine(ContextView().DebugView());
+#endif
 
                 List<(Request, Connection)> sentMessages = new();
 
@@ -301,7 +309,7 @@ internal class ServerConnection
             {
                 var originalSize = ContextView().Connections.Count;
 
-                SpinWait.SpinUntil(() => Context.Connections.Count != originalSize);
+                SpinWait.SpinUntil(() => originalSize != ContextView().Connections.Count);
 
                 List<Connection> ToRemove = new List<Connection>();
 

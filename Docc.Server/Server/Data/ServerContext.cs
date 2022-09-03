@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Sockets;
+using System.Text;
 
 namespace Docc.Server.Data;
 
@@ -66,4 +67,53 @@ internal class ServerContext
         conn = users.First();
         return true;
     }
+    public bool EditUserById(string userId, Func<Connection, Connection> editor)
+    {
+        if (!TryGetUserById(userId, out Connection? conn))
+        {
+            return false;
+        }
+
+        var index = Connections.IndexOf(conn!);
+
+        Connections[index] = editor(conn!);
+        return true;
+    }
+
+#if DEBUG
+    internal string DebugView()
+    {
+        StringBuilder view = new();
+        var version = Environment.GetEnvironmentVariable("App-Version");
+        var introduction = $"Docc [server] {version}";
+
+        view.AppendLine($"Docc [server] {version} (debug view)");
+        view.AppendLine(new string('^', introduction.Length));
+
+        view.AppendLine();
+
+        view.AppendLine($"address: {Address}");
+        view.AppendLine($"endpoint: {Endpoint}\n");
+
+        view.AppendLine(" == Socket Info ==\n");
+
+        view.AppendLine($"available bytes: {Socket.Available}");
+        view.AppendLine($"buffer size: {Socket.ReceiveBufferSize}");
+
+        foreach (var conn in Connections)
+        {
+            view.AppendLine($"\n\n ==Connection Info for '{conn.Client!.Name}'==\n");
+            view.AppendLine($"clientId: {conn.Client.UserId}");
+            view.AppendLine($"permissions: {string.Join(", ", conn.Client.Permissions)}");
+            view.AppendLine($"tags: {string.Join(", ", conn.Client.Tags)}\n");
+
+            view.AppendLine($"sessionId: {conn.SessionKey.Value}");
+            view.AppendLine($"expiresAt: {conn.SessionKey.ExpiresAt.ToLongDateString()} {conn.SessionKey.ExpiresAt.ToLongTimeString()}\n");
+
+            view.AppendLine($"availableBytes : {conn.Socket!.Available}");
+        }
+
+        return view.ToString();
+    }
+#endif
 }

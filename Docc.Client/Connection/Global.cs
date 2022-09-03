@@ -40,7 +40,7 @@ public static class Global
         }
         catch (ObjectDisposedException)
         {
-            msg = "cannot cannot to the server.";
+            msg = "cannot connect to the server.";
         }
 
         Client = conn;
