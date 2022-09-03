@@ -9,14 +9,14 @@ internal class CommandLogger : ILogger
     public static string Tab
         => new(' ', 5);
 
-    public void Log(string message)
+    public void Log<T>(T target, string message)
     {
-        Console.WriteLine($"{DateTime.Now.ToLongTimeString()} {Target}{Tab}{message}");
+        Console.WriteLine($"{DateTime.Now.ToLongTimeString()} {typeof(T).Name}{Tab}{message}");
     }
 
-    public void Log(string message, params object[] args)
+    public void Log<T>(T target, string message, params object[] args)
     {
-        Console.WriteLine($"{DateTime.Now.ToLongTimeString()} {Target}\t{message}", args);
+        Console.WriteLine($"{DateTime.Now.ToLongTimeString()} {typeof(T).Name}\t{message}", args);
 
     }
 }

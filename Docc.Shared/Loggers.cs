@@ -5,43 +5,40 @@ namespace Docc.Common;
 
 public interface ILogger
 {
-    public string Target { get; }
-
-    void Log(string message);
-    void Log(string message, params object[] args);
+    void Log<T>(T target, string message);
+    void Log<T>(T target, string message, params object[] args);
 }
 
 public class ServerConsoleLogger : ILogger
 {
-    public string Target => "server";
     public static string Tab
         => new(' ', 5);
 
-    public void Log(string message)
+    public void Log<T>(T target, string message)
     {
-        Console.WriteLine($"{DateTime.Now.ToLongTimeString()} {Target.Pastel(Color.Green)}{Tab}{message}");
+        var time = DateTime.Now;
+        Console.WriteLine($"{time.ToLocalTime().ToLongTimeString()}+{time.Millisecond}  {typeof(T).Name.ToLower().Pastel(Color.LightBlue)}{Tab}{message}");
     }
 
-    public void Log(string message, params object[] args)
+    public void Log<T>(T target, string message, params object[] args)
     {
-        Console.WriteLine($"{DateTime.Now.ToLongTimeString()} {Target}\t{message}", args);
-
+        var time = DateTime.Now;
+        Console.WriteLine($"{time.ToLocalTime().ToLongTimeString()}+{time.Millisecond}  {typeof(T).Name.ToLower().Pastel(Color.LightBlue)}{Tab}{message}", args);
     }
 }
 public class ClientConsoleLogger : ILogger
 {
-    public string Target => "client";
     public static string Tab
         => new(' ', 5);
 
-    public void Log(string message)
+    public void Log<T>(T target, string message)
     {
-        Console.WriteLine($"{DateTime.Now.ToLongTimeString()} {Target}{Tab}{message}");
+        Console.WriteLine($"{DateTime.Now.ToLongTimeString()} {typeof(T).Name}{Tab}{message}");
     }
 
-    public void Log(string message, params object[] args)
+    public void Log<T>(T target, string message, params object[] args)
     {
-        Console.WriteLine($"{DateTime.Now.ToLongTimeString()} {Target}\t{message}", args);
+        Console.WriteLine($"{DateTime.Now.ToLongTimeString()} {typeof(T).Name}\t{message}", args);
 
     }
 }

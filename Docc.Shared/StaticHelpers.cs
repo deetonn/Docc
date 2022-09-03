@@ -109,7 +109,7 @@ public static class SocketExtensions
         }
         catch (SocketException ex)
         {
-            logger?.Log($"failed to send request. ({ex.Message})");
+            logger?.Log(ex ,$"failed to send request. ({ex.Message})");
 
             // at this point we assume they've disconnected.
             sock?.Dispose();

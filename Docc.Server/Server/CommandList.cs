@@ -40,7 +40,7 @@ internal class CommandList
     {
         if (!Exists(name))
         {
-            _logger.Log($"no such command '{name}'");
+            _logger.Log(this, $"no such command '{name}'");
             return;
         }
 

@@ -95,7 +95,7 @@ manager.MapGet("/chat/api/sendMessage", (args, conn) =>
 {
     if (!conn.Client.Permissions.Contains("send_message"))
     {
-        connection.Logger?.Log($"rejected message from `{conn?.Client?.Name}`, they are muted.");
+        connection.Logger?.Log(manager, $"rejected message from `{conn?.Client?.Name}`, they are muted.");
 
         var rejectionMessage = new RequestBuilder()
             .WithLocation("/error/handle")
@@ -194,7 +194,7 @@ context.Add("connections", (args, logger) =>
 
     if (!view.Connections.Any())
     {
-        logger.Log("there is currently zero people connected.");
+        logger.Log(view, "there is currently zero people connected.");
         return;
     }
 
@@ -202,14 +202,14 @@ context.Add("connections", (args, logger) =>
 
     foreach (var conn in connections)
     {
-        logger.Log($"[{conn.Client?.Name}, {{uuid: {conn.Client?.UserId}}}] - sessionId: {conn.SessionKey.Value} (expires at {conn.SessionKey.ExpiresAt.ToLongTimeString()})");
+        logger.Log(view, $"[{conn.Client?.Name}, {{uuid: {conn.Client?.UserId}}}] - sessionId: {conn.SessionKey.Value} (expires at {conn.SessionKey.ExpiresAt.ToLongTimeString()})");
     }
 });
 context.Add("invalidate", (args, logger) =>
 {
     if (!(args.Length == 1))
     {
-        logger.Log("usage: invalidate <user-id> [will invalidate a users session token]");
+        logger.Log(connection, "usage: invalidate <user-id> [will invalidate a users session token]");
         return;
     }
 
@@ -218,7 +218,7 @@ context.Add("invalidate", (args, logger) =>
 
     if (!view.TryGetUserById(uid, out var user))
     {
-        logger.Log("no user connected with that id");
+        logger.Log(view, "no user connected with that id");
         return;
     }
 
@@ -228,13 +228,13 @@ context.Add("mute", (args, logger) =>
 {
     if (!(args.Length == 1))
     {
-        logger.Log("usage: mute <userid>");
+        logger.Log(context, "usage: mute <userid>");
         return;
     }
 
     if (!connection.ContextView().TryGetUserById(args[0], out var user))
     {
-        logger.Log("user does not exist in this context.");
+        logger.Log(context, "user does not exist in this context.");
         return;
     }
 
@@ -248,13 +248,13 @@ context.Add("unmute", (args, logger) =>
 {
     if (!(args.Length == 1))
     {
-        logger.Log("usage: unmute <userid>");
+        logger.Log(context, "usage: unmute <userid>");
         return;
     }
 
     if (!connection.ContextView().TryGetUserById(args[0], out var user))
     {
-        logger.Log("user does not exist in this context.");
+        logger.Log(context, "user does not exist in this context.");
         return;
     }
 
@@ -267,7 +267,7 @@ context.Add("unmute", (args, logger) =>
 
 connection.OnMessage = (req, client) =>
 {
-    connection.Logger?.Log($"received request for '{req.Location}'");
+    connection.Logger?.Log(connection, $"received request for '{req.Location}'");
 
     manager.CallMappedOnline(req.Location, req.Arguments, client);
 };
@@ -276,7 +276,7 @@ context.Add("user.create", (args, logger) =>
 {
     if (!(args.Length == 2))
     {
-        logger.Log("usage: user.create <name> <password>");
+        logger.Log(context, "usage: user.create <name> <password>");
         return;
     }
 
@@ -285,7 +285,7 @@ context.Add("user.create", (args, logger) =>
 
     connection.AddUser(user, pass);
 
-    logger.Log($"created user. [{user}, {args[1]}]");
+    logger.Log(connection, $"created user. [{user}, {args[1]}]");
 });
 
 while (true)

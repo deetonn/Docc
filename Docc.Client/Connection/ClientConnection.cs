@@ -42,7 +42,7 @@ public class ClientConnection
         {
             try
             {
-                _logger.Log($"attempting to connect to the server");
+                _logger.Log(this, $"attempting to connect to the server");
                 Socket.Connect(ServerEndpoint);
             }
             catch
@@ -56,10 +56,10 @@ public class ClientConnection
 
         if (attempts == 5)
         {
-            _logger.Log("failed to connect to the server.");
+            _logger.Log(this, "failed to connect to the server.");
         }
 
-        _logger.Log($"resolved host [{ServerEndpoint.Address}:{ServerEndpoint.Port}, {ServerEndpoint.AddressFamily}]");
+        _logger.Log(this, $"resolved host [{ServerEndpoint.Address}:{ServerEndpoint.Port}, {ServerEndpoint.AddressFamily}]");
 
         var rb = new RequestBuilder()
             .WithArguments(new() { { "userName", userName }, { "hashedPw", raw ? password : StorageUtil.Sha256Hash(password) } });
@@ -69,7 +69,7 @@ public class ClientConnection
 
         if (status is null)
         {
-            _logger.Log("server failed to respond with handshake.");
+            _logger.Log(this, "server failed to respond with handshake.");
             // so IDE's can see that beyond this point status will not
             // be null.
             return;
@@ -77,7 +77,7 @@ public class ClientConnection
 
         if (status.Result != RequestResult.OK)
         {
-            _logger.Log($"server rejected the connection with reason: {Translation.From(status.Result).Conversion}");
+            _logger.Log(this, $"server rejected the connection with reason: {Translation.From(status.Result).Conversion}");
             Connected = false;
 
             if (status.Content.Any())
@@ -86,7 +86,7 @@ public class ClientConnection
             return;
         }
 
-        _logger.Log("connected to server!");
+        _logger.Log(this, "connected to server!");
         Connected = true;
         SessionId = status.Arguments["session_id"];
 
@@ -111,11 +111,11 @@ public class ClientConnection
 
     public Request? MakeRequest(Request query)
     {
-        _logger.Log($"making request to '{query.Location}'");
+        _logger.Log(this, $"making request to '{query.Location}'");
 
         Socket.SendEncrypted(query, _logger);
         var res = Socket.ReceiveEncrypted();
-        _logger.Log($"received response '{res?.Location}' ({res?.Result})");
+        _logger.Log(this, $"received response '{res?.Location}' ({res?.Result})");
         return res;
     }
 

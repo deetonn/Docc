@@ -89,7 +89,7 @@ internal class ServerConnection
          * but also matches ServerClients to sessionIds.
          */
 
-        Logger?.Log($"starting server. ({AppName})");
+        Logger?.Log(this, $"starting server. ({AppName})");
 
         if (connType != ServerType.Local)
         {
@@ -100,7 +100,7 @@ internal class ServerConnection
 
         Listener = new(() =>
         {
-            Logger?.Log("connection listener has started");
+            Logger?.Log(this, "connection listener has started");
 
             while (Running)
             {
@@ -195,7 +195,7 @@ internal class ServerConnection
                 // We want to send the client their sessionId.
                 // So that any future requests can verify them that way.
 
-                Logger?.Log($"accepted client `{connection?.Client?.Name}`");
+                Logger?.Log(this, $"accepted client `{connection?.Client?.Name}`");
 
                 Context.Connections.Add(connection!);
 
@@ -209,7 +209,7 @@ internal class ServerConnection
         });
         MessageAcceptor = new(() =>
         {
-            Logger?.Log("message acceptor has started");
+            Logger?.Log(this, "message acceptor has started");
 
             while (Running)
             {
@@ -285,7 +285,7 @@ internal class ServerConnection
 
                     if (message?.Result == RequestResult.Disconnecting)
                     {
-                        Logger?.Log($"{client.Client?.Name} has disconnected.");
+                        Logger?.Log(this, $"{client.Client?.Name} has disconnected.");
                         Context.Connections.Remove(client);
                         continue;
                     }
@@ -303,7 +303,7 @@ internal class ServerConnection
         });
         ConnectionValidator = new(() =>
         {
-            Logger?.Log("connection validator started");
+            Logger?.Log(this, "connection validator started");
 
             while (Running)
             {
@@ -329,7 +329,7 @@ internal class ServerConnection
                     // when they've disconnected it all gets cleaned up (Main.cs, disconnect endpoint),
                     // so all there is to do is remove it from active connections.
 
-                    Logger?.Log($"`{dead.Client?.Name}` has disconnected");
+                    Logger?.Log(this, $"`{dead.Client?.Name}` has disconnected");
                     Context.Connections.Remove(dead);
                 }
             }
