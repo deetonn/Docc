@@ -1,22 +1,23 @@
 ﻿using Docc.Common;
+using Pastel;
+using System.Drawing;
 
 namespace Docc.Server.Server;
 
 internal class CommandLogger : ILogger
 {
-    public string Target => "ServerContext";
-
     public static string Tab
         => new(' ', 5);
 
     public void Log<T>(T target, string message)
     {
-        Console.WriteLine($"{DateTime.Now.ToLongTimeString()} {typeof(T).Name}{Tab}{message}");
+        var time = DateTime.Now;
+        Console.WriteLine($"{time.ToLocalTime().ToLongTimeString()}+{time.Millisecond}  {typeof(T).Name.ToLower().Pastel(Color.LightBlue)}{Tab}{message}");
     }
 
     public void Log<T>(T target, string message, params object[] args)
     {
-        Console.WriteLine($"{DateTime.Now.ToLongTimeString()} {typeof(T).Name}\t{message}", args);
-
+        var time = DateTime.Now;
+        Console.WriteLine($"{time.ToLocalTime().ToLongTimeString()}+{time.Millisecond}  {typeof(T).Name.ToLower().Pastel(Color.LightBlue)}{Tab}{message}", args);
     }
 }

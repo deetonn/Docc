@@ -10,7 +10,6 @@ using Docc.Server.Server.Auth;
 using Docc.Common.Storage;
 using Docc.Server.Endpoints;
 using System.Drawing;
-using Pastel;
 
 Environment.SetEnvironmentVariable("App-Version", "v0.0.6-dev.1");
 Environment.SetEnvironmentVariable("App-Agent", $"Docc {Environment.GetEnvironmentVariable("App-Version")}");
@@ -95,7 +94,7 @@ manager.MapGet("/chat/api/sendMessage", (args, conn) =>
 {
     if (!conn.Client.Permissions.Contains("send_message"))
     {
-        connection.Logger?.Log(manager, $"rejected message from `{conn?.Client?.Name}`, they are muted.");
+        connection.Logger?.Log(connection, $"rejected message from `{conn?.Client?.Name}`, they are muted.");
 
         var rejectionMessage = new RequestBuilder()
             .WithLocation("/error/handle")
